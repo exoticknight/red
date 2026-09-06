@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: cli/node/package-lock.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: npm ci
+        working-directory: cli/node
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python scripts/sync_distribution.py
+      - run: npm test
+        working-directory: cli/node
+      - run: npm run check
+        working-directory: cli/node
+      - run: node cli/node/src/cli.js check --json
+      - run: python -m unittest discover -s tests -v
+        working-directory: cli/python
+      - run: python cli/conformance/run.py
+      - run: python scripts/validate_repository.py
+      - name: Build npm package
+        run: |
+          mkdir -p ../../dist/npm
+          npm pack --pack-destination ../../dist/npm
+        working-directory: cli/node
+      - run: python -m build cli/python --outdir dist/python
+      - name: Build and verify plugin bundles
+        run: |
+          VERSION=$(node -p "require('./cli/node/package.json').version")
+          python scripts/build_release_assets.py "$VERSION"
+          python scripts/verify_release_assets.py "$VERSION"
