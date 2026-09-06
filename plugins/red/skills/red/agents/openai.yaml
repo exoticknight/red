@@ -1,0 +1,7 @@
+interface:
+  display_name: "RED"
+  short_description: "Manage project knowledge through RED states"
+  default_prompt: "Use $red to handle this project task with the RED methodology."
+
+policy:
+  allow_implicit_invocation: true

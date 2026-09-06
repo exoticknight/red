@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/exoticknight/red/blob/main/spec/output-schema.json",
+  "title": "RED CLI JSON result",
+  "type": "object",
+  "required": ["ok"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "protocolVersion": { "type": "integer", "minimum": 1 },
+    "releaseVersion": { "type": "string" },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "path": { "type": "string" },
+    "id": { "type": "string" },
+    "state": { "type": "string" },
+    "status": { "type": "string" }
+  },
+  "additionalProperties": true
+}

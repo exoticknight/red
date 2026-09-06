@@ -1,0 +1,35 @@
+{
+  "name": "red",
+  "version": "0.1.0",
+  "description": "Keep project research, ongoing change, and accepted knowledge distinct with RED.",
+  "author": {
+    "name": "exoticknight",
+    "url": "https://github.com/exoticknight/red"
+  },
+  "homepage": "https://github.com/exoticknight/red",
+  "repository": "https://github.com/exoticknight/red",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ai",
+    "agents",
+    "engineering",
+    "knowledge-management"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "RED",
+    "shortDescription": "Keep project knowledge in the right state.",
+    "longDescription": "RED helps agents separate unresolved research, ongoing change, and accepted project knowledge while working with existing documentation.",
+    "developerName": "exoticknight",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use RED to handle this engineering task.",
+      "Adopt RED in this existing project.",
+      "Inspect this project's RED knowledge state."
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/exoticknight/red/blob/main/spec/artifact-schema.json",
+  "title": "RED Protocol 1 artifact metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "state", "status", "title", "created"],
+  "properties": {
+    "id": { "type": "string" },
+    "state": { "enum": ["research", "evolve"] },
+    "status": { "enum": ["open", "closed", "accepted", "rejected"] },
+    "title": { "type": "string", "minLength": 1 },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$"
+    },
+    "based_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[RE]-(?:[1-9][0-9]*|0[0-9]{3})$" }
+    },
+    "document_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "allOf": [
+          { "not": { "pattern": "^(?:[A-Za-z]:|/|\\\\)" } },
+          { "not": { "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)" } }
+        ]
+      }
+    },
+    "verified": { "type": "boolean" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "state": { "const": "research" } }, "required": ["state"] },
+      "then": {
+        "properties": {
+          "id": { "type": "string", "pattern": "^R-(?:[1-9][0-9]*|0[0-9]{3})$" },
+          "status": { "enum": ["open", "closed"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "state": { "const": "evolve" } }, "required": ["state"] },
+      "then": { "properties": { "id": { "type": "string", "pattern": "^E-(?:[1-9][0-9]*|0[0-9]{3})$" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "accepted" } }, "required": ["status"] },
+      "then": {
+        "required": ["document_paths", "verified"],
+        "properties": { "verified": { "const": true } }
+      }
+    }
+  ]
+}

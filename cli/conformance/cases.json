@@ -1,0 +1,14 @@
+{
+  "protocolVersion": 1,
+  "cases": [
+    { "args": ["init", "--json"], "exitCode": 0 },
+    { "args": ["new", "research", "--title", "Tag semantics", "--json"], "exitCode": 0 },
+    { "args": ["promote", "R-1", "--to", "evolve", "--title", "Adopt tags", "--json"], "exitCode": 0 },
+    { "args": ["instructions", "install", "--target", "AGENTS.md", "--json"], "exitCode": 0 },
+    { "args": ["instructions", "export", "--output", "RED.md", "--json"], "exitCode": 0 },
+    { "args": ["promote", "E-1", "--to", "document", "--accepted", "--verified", "--document", "README.md", "--json"], "exitCode": 0 },
+    { "args": ["check", "--json"], "exitCode": 0 },
+    { "args": ["status", "--json"], "exitCode": 0 },
+    { "args": ["unknown-command"], "exitCode": 2 }
+  ]
+}

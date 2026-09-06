@@ -1,0 +1,14 @@
+version = 1
+
+[document]
+paths = ["README.md", "docs/**"]
+
+[research]
+path = "research"
+
+[evolve]
+path = "evolve"
+
+[policy]
+document_requires_approval = true
+report_document_implementation_conflicts = true

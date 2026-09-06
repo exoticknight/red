@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+cli/node/bundled/
+cli/python/src/red_cli/bundled/
+cli/node/LICENSE
+cli/node/NOTICE
+cli/python/LICENSE
+cli/python/NOTICE
+.tmp/
+/.agents/
+
+# This repository keeps its RED working state local.
+/research/
+/evolve/

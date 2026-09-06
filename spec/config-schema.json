@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/exoticknight/red/blob/main/spec/config-schema.json",
+  "title": "RED Protocol 1 configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "document", "research", "evolve", "policy"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "document": { "$ref": "#/$defs/document" },
+    "research": { "$ref": "#/$defs/artifactDirectory" },
+    "evolve": { "$ref": "#/$defs/artifactDirectory" },
+    "policy": { "$ref": "#/$defs/policy" }
+  },
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "allOf": [
+        { "not": { "pattern": "^(?:[A-Za-z]:|/|\\\\)" } },
+        { "not": { "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)" } }
+      ]
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        }
+      }
+    },
+    "artifactDirectory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": { "path": { "$ref": "#/$defs/relativePath" } }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_requires_approval", "report_document_implementation_conflicts"],
+      "properties": {
+        "document_requires_approval": { "type": "boolean" },
+        "report_document_implementation_conflicts": { "type": "boolean" }
+      }
+    }
+  }
+}
