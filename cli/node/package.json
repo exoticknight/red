@@ -1,9 +1,11 @@
 {
   "name": "@exoticknight/red",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deterministic project operations for the RED methodology",
   "author": "exoticknight",
-  "publishConfig": {"access": "public"},
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "bin": {
     "red": "./src/cli.js"

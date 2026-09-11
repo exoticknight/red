@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Expand the npm and PyPI package pages with the RED model, Skill and CLI roles, installation, first-use examples, maintenance commands, and documentation links.
+- Add the English edition of the RED paper and link the two language editions from the paper and package pages.
+- Verify existing npm releases through the exact version endpoint when retrying publication.
+
 ## 0.1.0
 
 - Define RED Protocol 1 and its Research, Evolve, and Document states.

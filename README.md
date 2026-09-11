@@ -15,7 +15,7 @@ The distinction matters because an agent should not turn a research note into a 
 
 ## Methodology
 
-- [Introducing RED: A Methodology for AI Understanding](methodology/introducing-red.md): the original paper, motivation, and conceptual model.
+- Introducing RED: A Methodology for AI Understanding: [English](methodology/introducing-red.en.md) · [中文原文](methodology/introducing-red.md). The paper explains the motivation and conceptual model.
 - [RED Protocol 1](spec/protocol.md): the normative definitions, artifact rules, and transition semantics.
 - [Adoption guide](docs/adoption.md): delivery forms and guidance for adding RED to an existing project.
 

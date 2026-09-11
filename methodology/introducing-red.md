@@ -1,5 +1,7 @@
 # Introducing RED: A Methodology for AI Understanding
 
+中文原文 · [English](introducing-red.en.md)
+
 **摘要**：本文提出一种面向 AI 协作的方法论——RED。RED 将项目知识按状态分为三层：Research（研究层，处理未知）、Evolve（演进层，推动变化）、Document（文档层，沉淀共识）。核心观点是：AI 协作中的混乱，根源在于 AI 的平面上下文与人类的分层认知之间的缺口。RED 通过给知识打上“状态标签”，让 AI 能够区分事实、假设和决策，从而在不依赖超长上下文的前提下保持对项目的持续理解。这套方法论源于 AI 编程实践，其思想可推广至任何需要人与 AI 共同完成认知任务的场景。
 
 ---
