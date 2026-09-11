@@ -2,6 +2,26 @@
 
 RED has two CLI implementations but one protocol. A behavior change is complete only when both implementations and the shared conformance suite agree.
 
+## Maintainer setup
+
+This repository uses RED to maintain itself. The canonical Skill lives in `plugins/red/skills/red`; install its release-matched snapshot into `.agents/skills/red` when working on this repository. Git ignores the installed snapshot.
+
+On a fresh checkout, synchronize the package trees before using the source CLI:
+
+```sh
+python scripts/sync_distribution.py
+node cli/node/src/cli.js skill install --scope repo --json
+```
+
+After changing the canonical Skill, synchronize and update the local installation:
+
+```sh
+python scripts/sync_distribution.py
+node cli/node/src/cli.js skill update --scope repo --json
+```
+
+Changes to RED's public behavior, protocol, architecture, or release policy begin in Evolve. Use Research when an unknown can change the decision. Present Research findings and obtain authorization before entering Evolve; after implementation and verification, present the evidence and proposed Document changes for separate acceptance.
+
 ## Local checks
 
 Install the development dependencies and generate ignored package inputs first:

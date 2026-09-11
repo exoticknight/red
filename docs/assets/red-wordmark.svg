@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="188" viewBox="0 0 480 188" role="img" aria-labelledby="title desc">
+  <title id="title">RED</title>
+  <desc id="desc">A deep red wordmark with three ascending tiles representing Research, Evolve, and Document.</desc>
+  <rect x="1" y="1" width="478" height="186" rx="28" fill="#fffaf7" stroke="#e8ddd7"/>
+  <g fill="#c1121f">
+    <rect x="37" y="91" width="19" height="34" rx="5" opacity=".35"/>
+    <rect x="62" y="70" width="19" height="55" rx="5" opacity=".65"/>
+    <rect x="87" y="49" width="19" height="76" rx="5"/>
+    <path d="M139 125V49h32c20 0 32 9 32 25 0 11-6 19-16 23l22 28h-23l-19-25h-9v25zm19-42h12c9 0 14-3 14-9s-5-9-14-9h-12z"/>
+    <path d="M223 49h58v17h-39v12h34v17h-34v13h40v17h-59z"/>
+    <path fill-rule="evenodd" d="M300 49h30c25 0 42 15 42 38s-17 38-42 38h-30zm19 17v42h10c15 0 24-8 24-21s-9-21-24-21z"/>
+    <circle cx="400" cy="115" r="10"/>
+  </g>
+  <text x="240" y="157" text-anchor="middle" fill="#62554e" font-family="Segoe UI, Arial, sans-serif" font-size="13" letter-spacing="2">RESEARCH / EVOLVE / DOCUMENT</text>
+</svg>
