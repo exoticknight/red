@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Clarify knowledge ownership, durable rationale, reader-task verification, and replacement of existing knowledge in the RED Skill.
+- Add scenarios for package installation guides, package renaming, and retiring design records.
+- Refresh the repository README with RED visuals and a quick start.
+
 ## 0.1.1
 
 - Expand the npm and PyPI package pages with the RED model, Skill and CLI roles, installation, first-use examples, maintenance commands, and documentation links.
