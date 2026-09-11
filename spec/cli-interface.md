@@ -23,8 +23,8 @@ Commands that return data accept `--json`. JSON objects conform to [output-schem
 ## One-shot execution
 
 ```sh
-npx -y red-methodology-cli@latest <command>
-pipx run --spec red-methodology-cli red <command>
+npx -y @exoticknight/red-cli@latest <command>
+pipx run --spec red-cli red <command>
 ```
 
 Agents should prefer an existing project-local or user-installed `red`. A Skill may try one approved, network-backed one-shot runner when no CLI exists, then continue manually if unavailable. It must not add dependencies or install globally without authorization.

@@ -1,8 +1,9 @@
 {
-  "name": "red-methodology-cli",
+  "name": "@exoticknight/red-cli",
   "version": "0.1.0",
   "description": "Deterministic project operations for the RED methodology",
   "author": "exoticknight",
+  "publishConfig": {"access": "public"},
   "type": "module",
   "bin": {
     "red": "./src/cli.js"

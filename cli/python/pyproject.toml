@@ -3,7 +3,7 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "red-methodology-cli"
+name = "red-cli"
 version = "0.1.0"
 description = "Deterministic project operations for the RED methodology"
 readme = "README.md"

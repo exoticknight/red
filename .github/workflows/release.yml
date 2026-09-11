@@ -68,7 +68,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm publish "dist/npm/red-methodology-cli-${GITHUB_REF_NAME#v}.tgz" --access public --provenance
+      - run: npm publish "dist/npm/exoticknight-red-cli-${GITHUB_REF_NAME#v}.tgz" --access public --provenance
 
   publish-pypi:
     needs: build
