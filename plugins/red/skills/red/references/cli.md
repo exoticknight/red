@@ -33,8 +33,8 @@ red instructions export --output RED.md
 One-shot forms:
 
 ```text
-npx -y @exoticknight/red-cli@latest <command>
-pipx run --spec red-cli red <command>
+npx -y @exoticknight/red@latest <command>
+pipx run --spec red-methodology red <command>
 ```
 
 The CLI installs the Skill snapshot shipped in its own release. Use `skill status` to inspect `.red-install.json` and `skill update` to replace only an installation managed by RED.

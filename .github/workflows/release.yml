@@ -68,7 +68,28 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: npm publish "dist/npm/exoticknight-red-cli-${GITHUB_REF_NAME#v}.tgz" --access public --provenance
+      - name: Publish npm package or verify an existing identical release
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { spawnSync } from 'node:child_process';
+          import { readFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const version = process.env.GITHUB_REF_NAME.slice(1);
+          const archive = `dist/npm/exoticknight-red-${version}.tgz`;
+          const result = spawnSync('npm', ['view', `@exoticknight/red@${version}`, 'dist.integrity', '--json'], { encoding: 'utf8' });
+          if (result.status === 0) {
+            const expected = 'sha512-' + createHash('sha512').update(readFileSync(archive)).digest('base64');
+            if (JSON.parse(result.stdout) !== expected) throw new Error('Published npm archive differs from this release');
+            console.log('Identical npm release already published');
+          } else {
+            let error;
+            try { error = JSON.parse(result.stdout).error; } catch {}
+            if (error?.code !== 'E404') throw new Error(result.stderr || 'Unable to query npm release');
+            const published = spawnSync('npm', ['publish', archive, '--access', 'public', '--provenance'], { stdio: 'inherit' });
+            process.exit(published.status ?? 1);
+          }
+          NODE
 
   publish-pypi:
     needs: build

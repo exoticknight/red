@@ -8,7 +8,7 @@
 
 Configure the GitHub repository before the first release:
 
-- Add trusted publisher records for `@exoticknight/red-cli` on npm and `red-cli` on PyPI.
+- Add trusted publisher records for `@exoticknight/red` on npm and `red-methodology` on PyPI.
 - Protect the `pypi` and `npm` environments if release approval is required.
 - Grant the workflow `id-token: write` only in publish jobs and `contents: write` only in the release job.
 

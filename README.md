@@ -55,11 +55,11 @@ There is one RED Skill. Its internal modes cover engineering work, adoption, ins
 Use either distribution as a one-shot runner. Both install the same Skill snapshot:
 
 ```sh
-npx -y @exoticknight/red-cli@latest skill install --scope repo
+npx -y @exoticknight/red@latest skill install --scope repo
 ```
 
 ```sh
-pipx run --spec red-cli red skill install --scope repo
+pipx run --spec red-methodology red skill install --scope repo
 ```
 
 Repository scope writes `.agents/skills/red`; user scope writes the corresponding user-level `.agents/skills/red`. The installer records its release and protocol in `.red-install.json`, enabling safe status, update, and uninstall operations.
@@ -67,9 +67,9 @@ Repository scope writes `.agents/skills/red`; user scope writes the correspondin
 The one-shot commands run the CLI to install the Skill; they do not install a permanent `red` command. For regular CLI use, install either distribution:
 
 ```sh
-npm install -g @exoticknight/red-cli
+npm install -g @exoticknight/red
 # Or, with Python:
-pipx install red-cli
+pipx install red-methodology
 ```
 
 Both expose `red`. Run `red skill install --scope repo` from the target project to install the Skill, then `red init` when explicit project configuration is needed. After upgrading the CLI package, run `red skill update --scope repo` to update an existing managed Skill installation.
@@ -77,8 +77,8 @@ Both expose `red`. Run `red skill install --scope repo` from the target project 
 For lightweight adoption:
 
 ```sh
-npx -y @exoticknight/red-cli@latest instructions install --target AGENTS.md
-npx -y @exoticknight/red-cli@latest instructions export --output RED.md
+npx -y @exoticknight/red@latest instructions install --target AGENTS.md
+npx -y @exoticknight/red@latest instructions export --output RED.md
 ```
 
 The `AGENTS.md` command owns only a marked block and preserves the rest of the file.

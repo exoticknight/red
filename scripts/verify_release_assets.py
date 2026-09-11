@@ -18,7 +18,7 @@ def require_members(actual: set[str], required: set[str], archive: Path) -> None
 
 
 def main(version: str) -> int:
-    npm = REPOSITORY / "dist" / "npm" / f"exoticknight-red-cli-{version}.tgz"
+    npm = REPOSITORY / "dist" / "npm" / f"exoticknight-red-{version}.tgz"
     with tarfile.open(npm, "r:gz") as archive:
         require_members(
             set(archive.getnames()),
@@ -33,9 +33,9 @@ def main(version: str) -> int:
             npm,
         )
 
-    wheels = list((REPOSITORY / "dist" / "python").glob(f"red_cli-{version}-*.whl"))
+    wheels = list((REPOSITORY / "dist" / "python").glob(f"red_methodology-{version}-*.whl"))
     source_distributions = list(
-        (REPOSITORY / "dist" / "python").glob(f"red_cli-{version}.tar.gz")
+        (REPOSITORY / "dist" / "python").glob(f"red_methodology-{version}.tar.gz")
     )
     if len(wheels) != 1 or len(source_distributions) != 1:
         raise ValueError("Expected one Python wheel and one source distribution")
