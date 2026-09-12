@@ -1,3 +1,5 @@
+<p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
+
 <p align="center">
   <img src="docs/assets/red-wordmark.svg" width="360" alt="RED — Research, Evolve, Document">
 </p>

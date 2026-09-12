@@ -5,7 +5,7 @@ The [Chinese formal paper](../introducing-red.md) and [English formal paper](../
 | Figure | Formal-paper files | Public-account files |
 |---|---|---|
 | Knowledge states | `red-states.zh.*`, `red-states.en.*` (Figure 1) | `red-states.wechat.*` (Figure 1) |
-| Routing and decision checkpoints | `red-transitions.zh.*`, `red-transitions.en.*` (Figure 2) | Explained in the article's case narrative |
+| Routing and decision checkpoints | `red-transitions.zh.*`, `red-transitions.en.*` (Figure 2) | `red-transitions.wechat.*` (Figure 2) |
 | CSV date-export example | `red-example.zh.*`, `red-example.en.*` (Figure 3) | `red-example.wechat.*` (optional case illustration) |
 
 Each name has an SVG and a PNG file. SVG provides scalable text and geometry; PNG is the portable delivery copy. Formal papers embed SVG and link to PNG fallbacks. The public-account draft marks its image position with an editorial HTML comment; insert the PNG using the platform editor. Surrounding prose explains the same relationships for readers unable to load images.
@@ -24,7 +24,7 @@ Keep labels and layout synchronized between the two formal-paper languages. Chec
 
 ## Preparing the public-account article
 
-Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and arranged vertically for phone reading. Upload it through the publishing editor at the image position in the article. The optional `red-example.wechat.png` has the same width. Preview the finished article on a phone, since the editor may resize images or change spacing.
+Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and arranged vertically for phone reading. Upload it through the publishing editor at the image position in the article. `red-transitions.wechat.png` follows the paragraph explaining how the documents drive the next action; it is also 1080 pixels wide. The optional `red-example.wechat.png` has the same width. Preview the finished article on a phone, since the editor may resize images or change spacing.
 
 The public-account draft uses absolute HTTPS URLs for all reader-facing links. Its full-article link points to the Chinese methodology article at `https://blog.e10t.net/red/`, with an English language switch. Before publishing, deploy the reviewed website and check that the desired revision is available at that public URL; local branch edits do not update it. The project homepage link points to `https://github.com/exoticknight/red`.
 

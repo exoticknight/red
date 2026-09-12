@@ -168,6 +168,31 @@ def transitions(lang, font):
          " ".join(h+". "+" ".join(ls) for h, ls in labels)+" "+" ".join(note), body, font)
 
 
+
+def wechat_transitions(font):
+    title = "三类文档，怎样推动工作"
+    body = text(40, 152, ["人的目标与判断，贯穿每一轮协作"], 26)
+    body += box(110, 195, 560, 150, "R · 调查与判断依据",
+                ["AI 调查问题，记录发现与建议", "人据此判断方向和取舍"], 0, 24)
+    body += arrow([(380, 345), (380, 445)])
+    body += text(408, 386, ["确认推进范围"], 22, COLORS[0], True)
+    body += box(110, 445, 560, 190, "E · 正在推进的改动",
+                ["把确认的范围落实为方案和行动", "根据结果与反馈，持续调整", "记录进展、验证结果与待决事项"], 1, 24)
+    body += arrow([(670, 490), (694, 490), (694, 597), (670, 597)])
+    body += arrow([(380, 635), (380, 735)])
+    body += text(408, 672, ["结果经确认接受", "同步相关说明"], 22, COLORS[1], True)
+    body += box(110, 735, 560, 190, "D · 后续可依循的共识",
+                ["按使用、开发、维护等需要", "整理已接受的规则与说明", "为后续判断和实施提供依据"], 2, 24)
+    body += arrow([(110, 860), (66, 860), (66, 267), (110, 267)])
+    body += text(110, 985, ["下一轮，先读已有 D", "有关键未知 → 回到 R 调查", "目标清楚且已获授权 → 进入 E"], 26)
+    body += text(40, 1138, ["推进中遇到影响方向的新问题，回到 R。",
+                           "反馈进入 E；接受的结果才更新 D。",
+                           "已有 D 也可能从项目开始就存在。"], 24)
+    save("red-transitions.wechat", 720, 1260, title,
+         "R 的发现支持范围确认，E 在授权范围内实施并根据反馈调整，结果被接受后同步 D。D 为下一轮调查和改动提供依据；明确获准的改动可直接进入 E。",
+         body, font)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--font", default="Microsoft YaHei")
@@ -179,6 +204,7 @@ def main():
         example(lang, args.font)
     states("zh", args.font, mobile=True)
     example("zh", args.font, mobile=True)
+    wechat_transitions(args.font)
 
 
 if __name__ == "__main__":

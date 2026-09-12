@@ -1,7 +1,7 @@
 version = 1
 
 [document]
-paths = ["README.md", "CONTRIBUTING.md", "methodology/**", "docs/**", "spec/**"]
+paths = ["README.md", "README.zh-CN.md", "CONTRIBUTING.md", "methodology/**", "docs/**", "spec/**"]
 
 [research]
 path = "research"
