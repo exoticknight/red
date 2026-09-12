@@ -26,3 +26,17 @@ Routes:
 - `introducing-red.en.html`: complete English article
 
 Figures open at full size when clicked. Readers need no JavaScript, remote fonts or external rendering service.
+
+## Publication and presentation
+
+The `publication` object in `build.mjs` owns the public author name, profile URL and the article site's first publication date. Both pages show that metadata and use the same values in Article structured data. Keep the date tied to publication; rebuilding the site does not change it. The configured public base URL also supplies the default-language link and social image URLs.
+
+The site follows the reader's system light/dark preference. Figures keep their authored colors and light backgrounds for legibility. Print styles retain the article title, byline, text and figures, with code wrapping to the page width. The stylesheet contains the theme colors, including code blocks, as CSS variables.
+
+`assets/favicon.svg` is the icon source; `assets/favicon.png` is its committed 64 × 64 fallback. After editing the SVG, regenerate the PNG with ImageMagick:
+
+```sh
+magick -background none assets/favicon.svg -resize 64x64 assets/favicon.png
+```
+
+Crawler rules belong to the host-root `/robots.txt`, managed with the existing blog/domain. GitHub Pages serves this project under `/red/`, so the build emits a sitemap but no subdirectory crawler rules.

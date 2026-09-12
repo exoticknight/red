@@ -10,6 +10,7 @@ RED separates a human/agent protocol from deterministic tooling.
 - `cli/node` and `cli/python` implement deterministic operations independently.
 - `cli/conformance` is the executable compatibility boundary shared by both implementations.
 - Release scripts copy the canonical Skill into each package; generated copies are not edited.
+- `methodology/` owns the Chinese and English methodology articles. `website/` renders those two sources into the GitHub Pages article site, with its own presentation and deployment workflow. The WeChat introduction is maintained separately and links to the Chinese site page.
 
 The plugin is skills-only. Host presentation metadata stays in `plugins/red/.codex-plugin/plugin.json`; `SKILL.md` stays portable.
 
@@ -22,6 +23,10 @@ The Python CLI uses `argparse` and `tomllib` from the supported Python standard 
 Repository validation uses PyYAML and jsonschema instead of custom YAML or JSON Schema implementations. Python packaging uses the PyPA `build` frontend with Hatchling as the backend.
 
 Separate Node and Python implementations are intentional distribution boundaries. Observable parity is enforced by shared fixtures rather than shared runtime code, so each package remains native and independently installable.
+
+The article site uses markdown-it for Markdown parsing and http-server for local previews. A small static template supplies navigation, article metadata and figures. CSS handles responsive layouts, system color preferences and print formatting. Readers need no JavaScript or remote rendering service. The website uses Node 22.12 or newer, matching the repository's Node toolchain; its dependencies and build output are separate from the CLI packages.
+
+GitHub Actions builds the site for pull requests and deploys accepted changes from `main`. Generated `website/dist/` files are ignored. Relative navigation and asset paths support the `/red/` project path; `SITE_URL` sets absolute canonical, alternate-language, sharing and sitemap URLs. The account's existing blog and the project site have separate deployment sources; the blog must reserve `/red/` for this project.
 
 ## Safety boundaries
 
