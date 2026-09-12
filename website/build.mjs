@@ -10,6 +10,12 @@ const origin = new URL(process.env.SITE_URL || 'https://blog.e10t.net/red/');
 if (!origin.pathname.endsWith('/')) origin.pathname += '/';
 const md = new MarkdownIt({ html: false, linkify: true });
 const esc = md.utils.escapeHtml;
+// The article site's first publication date is editorial metadata, not a build timestamp.
+const publication = {
+  author: { name: 'exoticknight', url: 'https://github.com/exoticknight' },
+  datePublished: '2026-09-12',
+};
+const pageUrl = page => new URL(page.url === 'index.html' ? './' : page.url, origin).href;
 const pages = [
   { file: 'introducing-red.md', url: 'index.html', lang: 'zh-CN', label: '中文', kind: '方法论', description: 'Research、Evolve、Document：按知识状态组织项目内容，让 AI 持续理解项目，并把讨论、实施与接受的共识连接起来。' },
   { file: 'introducing-red.en.md', url: 'introducing-red.en.html', lang: 'en', label: 'English', kind: 'METHODOLOGY', description: 'Research, Evolve, Document: a methodology for helping AI sustain an accurate understanding of a project as it changes.' },
@@ -22,6 +28,9 @@ for (const file of await readdir(path.join(source, 'assets'))) {
   if (/\.(zh|en)\.(svg|png)$/.test(file)) await copyFile(path.join(source, 'assets', file), path.join(out, 'assets', file));
 }
 await copyFile(path.join(root, 'style.css'), path.join(out, 'style.css'));
+for (const file of ['favicon.svg', 'favicon.png']) {
+  await copyFile(path.join(root, 'assets', file), path.join(out, file));
+}
 await writeFile(path.join(out, '.nojekyll'), '');
 
 for (const page of pages) {
@@ -50,21 +59,41 @@ for (const page of pages) {
   };
   const body = md.renderer.render(tokens, md.options, {});
   md.renderer.rules.image = originalImage;
-  const canonical = new URL(page.url === 'index.html' ? './' : page.url, origin).href;
+  const canonical = pageUrl(page);
+  const imageUrl = new URL(`assets/red-states.${english ? 'en' : 'zh'}.png`, origin).href;
+  const imageAlt = english ? 'RED: Research, Evolve and Document — their content and uses' : 'RED：Research、Evolve、Document 的内容与用途';
+  const publishedLabel = new Intl.DateTimeFormat(page.lang, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(publication.datePublished));
   const minutes = english ? Math.ceil(content.split(/\s+/).length / 220) : Math.ceil(content.replace(/\s/g, '').length / 450);
-  const alternates = pages.map(p => `<link rel="alternate" hreflang="${p.lang}" href="${new URL(p.url === 'index.html' ? './' : p.url, origin).href}">`).join('');
+  const alternates = pages.map(p => `<link rel="alternate" hreflang="${p.lang}" href="${esc(pageUrl(p))}">`).join('');
+  const articleData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${canonical}#article`,
+    headline: title,
+    description: page.description,
+    inLanguage: page.lang,
+    url: canonical,
+    mainEntityOfPage: canonical,
+    author: { '@type': 'Person', ...publication.author },
+    datePublished: publication.datePublished,
+    image: [imageUrl],
+    isPartOf: { '@type': 'WebSite', name: 'RED', url: origin.href },
+  };
   const html = `<!doctype html>
 <html lang="${page.lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)} · RED</title><meta name="description" content="${esc(page.description)}">
-<link rel="canonical" href="${canonical}">${alternates}<meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${new URL('assets/red-states.' + (english ? 'en' : 'zh') + '.png', origin).href}">
-<meta name="theme-color" content="#f8f7f3"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"></head>
+<meta name="author" content="${esc(publication.author.name)}">
+<link rel="canonical" href="${esc(canonical)}">${alternates}<link rel="alternate" hreflang="x-default" href="${esc(pageUrl(pages[0]))}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="RED"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${esc(imageUrl)}"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta property="og:locale" content="${english ? 'en_US' : 'zh_CN'}"><meta property="og:locale:alternate" content="${english ? 'zh_CN' : 'en_US'}"><meta property="article:published_time" content="${publication.datePublished}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(page.description)}"><meta name="twitter:image" content="${esc(imageUrl)}"><meta name="twitter:image:alt" content="${esc(imageAlt)}">
+<script type="application/ld+json">${JSON.stringify(articleData).replace(/</g, '\\u003c')}</script>
+<meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#181c1a" media="(prefers-color-scheme: dark)"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64"><link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any"><link rel="stylesheet" href="style.css"></head>
 <body><a class="skip" href="#article">${english ? 'Skip to article' : '跳到正文'}</a>
 <header class="site-header"><a class="brand" href="index.html" aria-label="${english ? 'RED home' : 'RED 首页'}">RED<span class="brand-dot">.</span></a><nav aria-label="${english ? 'Language' : '语言'}">${pages.map(p => `<a href="${p.url}" lang="${p.lang}"${p.url === page.url ? ' aria-current="page"' : ''}>${p.label}</a>`).join('')}<a class="repo" href="https://github.com/exoticknight/red">GitHub <span aria-hidden="true">↗</span></a></nav></header>
-<main id="article"><div class="article-heading"><div class="eyebrow"><span>RED / ${page.kind}</span><span>${minutes} ${english ? 'MIN READ' : '分钟阅读'}</span></div><h1>${esc(title)}</h1><p class="dek">${esc(page.description)}</p><div class="principles"><span><b>R</b> Research</span><span><b>E</b> Evolve</span><span><b>D</b> Document</span></div></div>
+<main id="article"><div class="article-heading"><div class="eyebrow"><span>RED / ${page.kind}</span><span>${minutes} ${english ? 'MIN READ' : '分钟阅读'}</span></div><h1>${esc(title)}</h1><p class="dek">${esc(page.description)}</p><p class="byline"><a rel="author" href="${esc(publication.author.url)}">${esc(publication.author.name)}</a><span>${english ? 'Published' : '发布于'} <time datetime="${publication.datePublished}">${esc(publishedLabel)}</time></span></p><div class="principles"><span><b>R</b> Research</span><span><b>E</b> Evolve</span><span><b>D</b> Document</span></div></div>
 <div class="reading-layout"><aside><details open><summary>${english ? 'IN THIS ARTICLE' : '本文目录'}</summary><nav aria-label="${english ? 'Table of contents' : '目录'}"><ol>${toc.join('')}</ol></nav></details></aside><div><article>${body}</article><section class="read-next"><p class="eyebrow">${english ? 'CONTINUE EXPLORING' : '继续阅读与实践'}</p>${pages.filter(p => p !== page).map(p => `<a href="${p.url}">${p.label} <span aria-hidden="true">↗</span></a>`).join('')}<a href="https://github.com/exoticknight/red">${english ? 'Try RED on your project' : '在你的项目里试试 RED'} <span aria-hidden="true">↗</span></a></section></div></div></main>
 <footer><a class="brand" href="index.html">RED<span class="brand-dot">.</span></a><span>Research · Evolve · Document</span><a href="https://github.com/exoticknight/red">${english ? 'Open-source project' : '开源项目'} ↗</a></footer></body></html>`;
   await writeFile(path.join(out, page.url), html);
   console.log(`Built ${page.url} (${toc.length} sections)`);
 }
-await writeFile(path.join(out, 'favicon.svg'), '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#ac302b"/><text x="32" y="46" text-anchor="middle" fill="white" font-family="sans-serif" font-size="46" font-weight="700">R</text></svg>');
-await writeFile(path.join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.map(p => `<url><loc>${esc(new URL(p.url === 'index.html' ? './' : p.url, origin).href)}</loc></url>`).join('')}</urlset>`);
+await writeFile(path.join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.map(p => `<url><loc>${esc(pageUrl(p))}</loc></url>`).join('')}</urlset>`);
