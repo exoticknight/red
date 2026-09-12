@@ -26,7 +26,7 @@ Keep labels and layout synchronized between the two formal-paper languages. Chec
 
 Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and arranged vertically for phone reading. Upload it through the publishing editor at the image position in the article. The optional `red-example.wechat.png` has the same width. Preview the finished article on a phone, since the editor may resize images or change spacing.
 
-The public-account draft uses absolute HTTPS URLs for all reader-facing links. Its full-article link points to the Chinese methodology article at `https://exoticknight.github.io/red/`, with an English language switch. Before publishing, deploy the reviewed website and check that the desired revision is available at that public URL; local branch edits do not update it. The project homepage link points to `https://github.com/exoticknight/red`.
+The public-account draft uses absolute HTTPS URLs for all reader-facing links. Its full-article link points to the Chinese methodology article at `https://blog.e10t.net/red/`, with an English language switch. Before publishing, deploy the reviewed website and check that the desired revision is available at that public URL; local branch edits do not update it. The project homepage link points to `https://github.com/exoticknight/red`.
 
 At the editorial image comment, upload `red-states.wechat.png` from this asset directory through the WeChat public-account editor and insert the uploaded image there. Use the platform-provided image address if preparing HTML. Remove the editorial comment when the image is in place. The author or an authorized assistant can do this during platform layout. No platform upload has been performed and no hosted image URL is assigned yet.
 

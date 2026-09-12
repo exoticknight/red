@@ -6,7 +6,7 @@ import MarkdownIt from 'markdown-it';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const source = path.resolve(root, '../methodology');
 const out = path.join(root, 'dist');
-const origin = new URL(process.env.SITE_URL || 'https://exoticknight.github.io/red/');
+const origin = new URL(process.env.SITE_URL || 'https://blog.e10t.net/red/');
 if (!origin.pathname.endsWith('/')) origin.pathname += '/';
 const md = new MarkdownIt({ html: false, linkify: true });
 const esc = md.utils.escapeHtml;

@@ -26,7 +26,7 @@ jobs:
       - run: npm run build
         working-directory: website
         env:
-          SITE_URL: ${{ vars.RED_SITE_URL || 'https://exoticknight.github.io/red/' }}
+          SITE_URL: ${{ vars.RED_SITE_URL || 'https://blog.e10t.net/red/' }}
       - uses: actions/upload-pages-artifact@v4
         with:
           path: website/dist
