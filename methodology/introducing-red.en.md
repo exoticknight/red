@@ -1,239 +1,194 @@
 # Introducing RED: A Methodology for AI Understanding
 
-[中文原文](introducing-red.md) · English
+You ask an AI to add CSV export to a project. The first conversation goes well, and the code passes its checks. Two weeks later, you ask it to add an exported field. It also changes the date format. A downstream program can no longer read the output. Looking back through the discussion, you find that the AI implemented an approach you had mentioned but never decided to adopt.
 
-**Abstract:** This paper presents RED, a methodology for collaboration with AI. RED organizes project knowledge into three states: Research, which addresses unknowns; Evolve, which develops changes; and Document, which preserves accepted understanding. Its central argument concerns the gap between an AI's flat conversational context and the distinctions people make when organizing knowledge. By making knowledge states explicit, RED helps an AI distinguish facts, hypotheses, and decisions, and maintain an understanding of a project without relying on an ever-longer context window. The methodology grew out of AI-assisted programming, but its principles apply to other kinds of cognitive work that people and AI undertake together.
+The AI found material relevant to the task and wrote code to match. It was missing the status of that material in the project: a question to investigate, a change in progress, or an established rule.
 
----
+We have encountered this kind of problem throughout our AI programming work, which began after the release of GPT-4o. Pasting the README, refining prompts, and keeping conversation logs can help the current session. As a project evolves, we still find ourselves explaining which decisions remain valid and which ideas we have abandoned. **Keeping an AI's understanding of a project current and correct becomes an engineering problem of its own.**
 
-You ask an AI to add CSV export to a project. In the first conversation, it understands the task and produces working code. Two weeks later, you ask it to change the exported fields. It starts changing the format on its own. After three unsuccessful attempts, you discover that it has been following a passing remark you made three months ago.
-
-Its context has become polluted. The conversation is long, old decisions sit alongside new ideas, and no document tells it which statements represent settled decisions and which were passing suggestions.
-
-We began working extensively with AI programming after the release of GPT-4o. Across personal projects, team collaboration, prototypes, and production maintenance, hundreds of conversations and repeated experiments on dozens of projects brought one problem into focus: **sustaining a correct understanding of the project had become a greater obstacle than generating code.**
-
-We tried feeding the AI the entire conversation history, pasting the README into every session, and relying on longer context windows. In our experience, projects could begin to drift after only a few days. Through repeated attempts, we developed a way to separate project knowledge by state, so that the AI could draw on different kinds of context for different purposes. We call it RED.
-
-Many implementation details remain open to discussion. This paper explains the underlying ideas.
+We call our approach RED: Research, Evolve, Document. It organizes project content by knowledge state and defines how an AI should use that content, carry out work, and leave the results for the next collaboration.
 
 ## 1. Four recurring difficulties in AI collaboration
 
-If you have used AI extensively in a project, you may recognize these situations.
+An AI's understanding of a project shows up in its next action. Ask it to modify a function, choose a dependency, or update documentation, and you find out what it is relying on.
 
-**The AI loses track of the project's foundations.**
+**The AI loses track of the project's foundations.** In a new conversation, it does not know who the project serves or why you chose the current architecture. The offline requirement you explained never made it into the project documentation, so it recommends an approach that depends on an online service. The code may work while the project heads in the wrong direction.
 
-At the start of a new conversation, the AI does not know what the project is for, why you designed it this way, or who will use it. You paste in the README. It reads it, but later in the conversation it loses track of the opening context. By the third requirements change, it recommends an approach that conflicts with the project's direction.
+**The AI confuses discussion with decisions.** You ask, “Should we consider supporting iOS?” In a later implementation, it adds interfaces for that possibility. Reviewing the material, you find both the idea and the confirmed requirements, but no account of how the discussion ended.
 
-**The AI fails to distinguish the authority of different statements.**
+**You struggle to inspect the project understanding behind its actions.** The AI produces a design you did not expect. You have to work backwards: which rule did it follow, where did that constraint come from, and did it carry an assumption into the implementation? If the basis for its actions consists of scattered conversational clues, you must reconstruct its input before deciding what to correct.
 
-You give it design documents, conversation logs, and user feedback together. It treats a product manager's casual speculation like a confirmed requirement. You ask, “Should we consider supporting iOS?” It takes this as a commitment and adds iOS-specific interfaces to the code.
+**Conversations fail to reach a useful conclusion.** You and the AI analyze a problem and compare approaches at length. Next time, you may start over. Or you save every summary to prevent forgetting and end up with overlapping documents whose status is unclear.
 
-**People cannot inspect and correct the AI's understanding.**
+These difficulties point to a gap: we supply the AI with project content without giving it an equally clear account of that content's knowledge state. Before carrying out a task, the AI must reconstruct which material it can use as a basis for action.
 
-The AI writes code that you know is wrong, but you cannot see how it has interpreted the project. Which assumptions led to this design? Which details did it infer from context, and which did it invent? You keep changing the prompt and generating another answer until you happen to get the right output.
+## 2. What is missing from the context
 
-**Conversations never reach a useful conclusion.**
-
-You spend a long time analyzing a problem, comparing approaches, and developing ideas with the AI. Afterwards, the work tends toward one of two outcomes. Sometimes nothing happens, and the next conversation starts over. Sometimes you save every transcript and summary to prevent forgetting, creating a growing collection of repetitive documents with unclear status. In one case, you lose the value of the discussion; in the other, you create more context noise.
-
-These difficulties point to a shared need: a structure that helps the AI maintain its understanding and helps people turn conversations into useful outcomes.
-
-## 2. Why giving the AI more documentation is insufficient
-
-A common response is to organize the documents and give them to the AI. In practice, that leaves several problems unresolved. We tried:
-
-- Pasting the README: later in a long conversation, the AI lost track of the beginning.
-- Supplying design documents: the documents could be outdated or too abstract to support concrete decisions.
-- Supplying the entire conversation history: the AI could not reliably distinguish conclusions from discussion or passing suggestions.
-- Generating a summary after every conversation: records accumulated without identifying what required action, what awaited confirmation, or what had become obsolete.
-- Repeating “Only do what I tell you”: this reduced the AI's initiative and its ability to help identify problems.
-
-At the knowledge-management level, the AI receives a flat stream of context. Confirmed requirements, casual ideas, its own guesses, and previously generated code all arrive as text. The conversation alone does not provide a dependable account of their authority.
-
-People organize that knowledge through distinctions: concluded versus under discussion, committed versus worth considering, established project practice versus a temporary choice for this task. The gap between those distinctions and the context we provide creates confusion in collaboration.
-
-The slogan “vibe coding” encourages people to guide AI coding by feel. In our experience, sustained work with that approach can become difficult within days. Without a baseline, boundaries, or maintained conclusions, each conversation asks the AI to guess the project's intent again.
-
-RED starts by making the project's knowledge structure available to both people and AI.
-
-## 3. The three knowledge states
-
-RED classifies project content by **knowledge state**.
-
-### R: Research
-
-Research addresses **unknowns**.
-
-A project contains many unanswered questions. What do users need? How does the existing system work? Is a proposed technical approach feasible? What do competing products do? Which claims rest on reliable evidence?
-
-These questions appear at the beginning of a project and throughout its development.
-
-Research provides a place for material that remains unsettled. It can include:
-
-- Incomplete investigations.
-- Questions that still lack an answer after investigation.
-- Contradictory information from different sources.
-- Personal judgments that may be wrong but are worth recording.
-
-Research can remain private. It may consist of personal drafts, investigation notes, or external material that has not yet been organized. Its value comes from identifying uncertainty, so that an unverified claim does not quietly become the basis of a later decision.
-
-The threshold for entering Research is low. The material need not be verified, but its status must be represented honestly.
-
-### E: Evolve
-
-Evolve addresses **change**.
-
-When a project decides to pursue a feature, design adjustment, architectural change, or new rule, the details may still need development before they belong in maintained documentation.
-
-Evolve holds that work as it takes shape. It usually includes:
-
-- The problem or opportunity motivating the change.
-- Candidate approaches and their tradeoffs.
-- The affected parts of the project.
-- Acceptance conditions.
-- Unresolved questions.
-
-People and agents can revise Evolve material throughout the work. Several approaches may coexist. A rejected approach can remain there with the reasoning behind its rejection.
-
-Evolve has a higher entry threshold than Research: supporting facts cannot consist of unmarked guesses, and assumptions must be identified as assumptions. A change can enter Evolve directly when the problem and objective are clear. Research is needed when an unknown could affect the choice of approach.
-
-Evolve includes the work of developing a proposal into an accepted change: design, programming, testing, trial use, revision, and discussions between people and AI about tradeoffs.
-
-### D: Document
-
-Document addresses **accepted understanding**.
-
-When project participants, including AI agents, need to know what the project should be and which goals, rules, and constraints remain in force, Document is the normative source. It expresses the project's current agreements and commitments. Its description of the running system may still be incomplete or inaccurate.
-
-Document contains confirmed knowledge that participants can rely on:
-
-- Project goals and boundaries.
-- Core concepts and terminology.
-- Usage and APIs.
-- Design principles and engineering rules.
-- Contribution practices.
-
-Document gives newcomers and existing participants a common entry point. A new contributor should use it to understand the project. An AI should begin each task with the relevant Document sources to establish a baseline, then load related Evolve material, Research, code, and tests as needed. It need not reread the entire project history.
-
-Document changes as the project changes. Altering the agreement it expresses requires discussion and acceptance through Evolve. Corrections and formatting changes that preserve meaning can proceed directly. Research drafts and provisional Evolve proposals need resolution before their conclusions belong in Document.
-
-Document has the highest entry threshold: its contents should have sufficient verification and acceptance to support continued use and long-term reading.
-
-## 4. How the states work together
-
-A typical route in an existing project looks like this:
+Consider a project summary handed to a new agent:
 
 ```text
-Current Document + implementation evidence
-                    |
-           Problem, request, or conflict
-                    |
-       +------------+-----------------------+
-       |                                    |
-Critical unknowns                    Clear goal and boundaries
-       |                                    |
-Research: investigate                        |
-       |                                    |
-Human authorizes Evolve                      |
-       +----------------+-------------------+
-                        |
-          Evolve: design, implement, test, revise
-                        |
-          Present evidence and proposed Document changes
-                        |
-                  Wait for acceptance
-                        |
-          Update Document and align the implementation
+CSV export uses YYYY-MM-DD.
+We discussed local date formats; users might find them easier to read.
+The format could follow the system locale.
+Downstream programs read the CSV; compatibility still needs checking.
 ```
 
-Document provides the starting point for normative understanding and the place to preserve accepted conclusions. Code, tests, and runtime results provide implementation evidence. People and AI use them to detect differences between actual behavior and the project's agreements. Work begins from the current baseline and verifiable implementation state, and ends with the implementation and Document aligned.
+All four statements concern date export. The summary does not tell the agent which statement is the current agreement and which is a candidate approach. It also leaves the authorized scope unclear while compatibility remains unresolved.
 
-Choose the route according to the knowledge state. Work does not have to pass through every state in sequence. A person can authorize a clear change directly in Evolve. Routine implementation under existing Document, or a small correction that preserves meaning, may not need a separate Evolve record. Use Research when an unknown could change the decision or acceptance conditions. Persist Research or Evolve in files or another system when work needs review, handoff, or continued tracking.
+People make these distinctions during collaboration. “Investigate this,” “Try this approach,” and “We have decided” permit different actions. We often leave those judgments in the conversation, then preserve only the subject matter in our documents.
 
-Route selection is flexible; transitions require an explicit decision. When an AI's Research findings support a proposal, it presents the findings, risks, and suggested scope, then pauses in Research. A person confirms whether the work should enter Evolve. Within the authorized scope, the AI can continue designing, coding, testing, and discussing the work. Once acceptance conditions are met, it presents evidence and the proposed Document changes, then waits for acceptance. It updates Document only after a person or the project's designated decision process accepts the result. A broad instruction at the beginning of the task cannot supply those later decisions before the results exist for review.
+The original record may contain enough clues for an AI to recover the decision. Later tasks must repeat that recovery. If a summary omits the decision, retrieval misses the relevant passage, or we have not yet made a decision, the AI has an incomplete basis for action.
 
-Consider a command-line task manager whose Document specifies JSON storage. A user asks to add tags to tasks. The request leaves enough uncertainty that it needs clarification before it can become an accepted requirement or an implementation task.
+RED records those judgments in the project's context structure. The same material can be expressed as:
 
-Start with Research. How often has the request appeared in issues? Does “tag” mean a category or a priority marker? How do other tools handle it? The investigation may remain incomplete or overturn earlier assumptions. The AI reports what it found, and you decide whether to enter Evolve and what scope to pursue.
+```text
+D / Current agreement
+The default CSV date format is YYYY-MM-DD.
 
-After that decision, compare an approach using `+tag` syntax with one using a `--tag` option. Record their tradeoffs, affected components, and compatibility with old data. Both approaches can remain in Evolve while you decide. Once the boundaries are clear, the AI implements the change, adds relevant tests, and revises it in response to feedback.
+R / Under investigation
+Which downstream programs depend on this format?
+Which locale should a local format use?
 
-When the acceptance conditions pass, the AI presents the results and proposed documentation. After you or the team accepts the result, update Document with the `tags` field and command examples. Preserve the accepted behavior there; keep the investigation and discussion history in their working records.
+E / Candidate change, not yet accepted
+Add an explicit local-format option while preserving the default.
+Confirm implementation scope after the compatibility investigation.
+```
 
-Research and Evolve need not be visible to everyone. Personal notes and short experiments can stay local. Work that needs shared review or continuation can use Git, issues, pull requests, or another collaboration system. Each project chooses how to share it, while Document remains the common source of accepted understanding.
+The agent can now distinguish behavior it must preserve, questions it should investigate, and a change still taking shape. Even if it encounters an old suggestion, it has a current agreement to check against.
 
-RED does not prescribe whether file-based Research and Evolve belong in Git. Tracking them does not change their knowledge state or turn them into Document.
+Here, “state” describes the content's role in collaboration. Its factual reliability is a separate dimension: a runtime log in R may be reliable evidence, while D's description of the implementation may be outdated. We need both accurate evidence and decisions about what the project should follow. RED preserves the outcome of the latter judgment as explicit project knowledge.
 
-### Bringing a conversation to a conclusion
+## 3. The three layers of RED
 
-RED does not require saving every conversation. A conversation is a temporary workspace for a person and an AI. It does not inherently belong to Research, Evolve, or Document. Persist material when someone will need to use it across tasks, people, or time.
+RED separates project content into three layers according to knowledge state. Each corresponds to a different way for the AI to work.
 
-At the end of a substantive conversation, the AI should help account for its outcomes:
+![Figure 1: Research addresses unknowns; Evolve develops changes; Document maintains accepted understanding. Each state has a different purpose in collaboration.](assets/red-states.en.svg)
 
-| Outcome | Treatment |
+*Figure 1. Content and purpose in R, E, and D. Evidence quality requires a separate judgment. [PNG version](assets/red-states.en.png).*
+
+### R: Research, investigate unknowns
+
+At the start of a project, we need to learn about users, technical feasibility, and existing systems. Later, we encounter unfamiliar code behavior, contradictory material, and new information that could change an approach. R holds these unknowns and the work of investigating them.
+
+In R, the AI reads code, gathers material, and runs experiments while distinguishing observations, inferences, and assumptions. For example, inspecting an import script may confirm that one program uses a fixed date parser. A claim that other consumers do the same still needs evidence.
+
+Research can remain incomplete or end without an answer. Preserve what you have learned, the coverage of the evidence, and the unknowns that affect the next decision.
+
+Once the investigation supports a recommendation, the AI presents its findings, risks, and suggested scope, then waits for a person to decide whether to proceed with the change. **Finding a workable approach and obtaining authorization to implement it are separate steps.**
+
+### E: Evolve, develop changes
+
+E holds a change as it takes shape: why it is needed, the proposed approach, its scope, acceptance conditions, and open questions.
+
+In E, you and the AI can compare approaches, write code, run tests, try the result, and revise it. Several approaches may coexist, and the AI can continue working within the authorized scope. You inspect the reasoning behind the proposal, the actual changes, and the verification results.
+
+A clear problem and goal with authorization to implement can enter E directly. An unknown that could affect the choice or acceptance conditions calls for investigation in R first. If such an unknown appears during implementation, surface it and reconsider the remaining scope.
+
+You may still revise or reject E's contents. The AI therefore needs to distinguish the approach it is developing from rules the project has accepted. After verification, it presents the results and proposed documentation update for acceptance by a person or a project-authorized process.
+
+### D: Document, preserve accepted understanding
+
+D preserves what the project has accepted and subsequent work should follow: project goals, core terminology, interfaces, architectural principles, usage, and engineering rules.
+
+These can remain in your existing README, architecture descriptions, or API documentation. Identify which documents form the current baseline. At the start of a new task, the AI reads the relevant parts, then consults E, R, and implementation as needed.
+
+This changes the starting point of a new conversation. The AI can establish what the project has already decided before investigating or changing the immediate subject. It need not reconstruct an agreement from the entire history first.
+
+D needs maintenance as the project evolves. Changes to accepted understanding go through E and acceptance of the result; corrections and formatting edits that preserve meaning can proceed directly. Content entering D should have the verification and confirmation needed for continued use. Keep rationale that helps readers understand the conclusion, while leaving temporary discussion and work history in R/E.
+
+## 4. Taking a change through RED
+
+Return to CSV export. Current D specifies `YYYY-MM-DD` as the default date format. You want the AI to investigate how to make dates easier for local users to read.
+
+You could start with this instruction:
+
+> Read the existing export agreement, then inspect downstream dependencies on the date format. Report confirmed dependencies, gaps in coverage, and candidate approaches separately. Wait for me to confirm the scope before implementing.
+
+The AI enters R. It inspects export and import code and might discover a downstream program that accepts only the current format. It recommends adding an explicit option while preserving the default, and reports which programs the investigation covered. You review the findings and authorize that scope.
+
+E should contain an actionable objective and acceptance conditions. This illustrative record uses option names to make the design concrete:
+
+```text
+Goal: allow an explicit local date format while preserving default compatibility.
+Approach: add --date-format local, with the locale supplied through --locale.
+Acceptance:
+- Without the new options, dates still use YYYY-MM-DD.
+- With local and en-GB selected, 2026-09-12 exports as 12/09/2026.
+- The downstream parsers we checked still read the default export.
+- Usage documentation explains defaults, locale selection, and output examples.
+```
+
+Within this scope, the AI changes the implementation, checks the default and new paths, and revises the work in response to your feedback. It then presents actual verification results, coverage gaps, and the proposed D update. The acceptance conditions give you something to review. “Tests passed” cannot stand in for your decision to make the new behavior a project commitment.
+
+After you accept the result, the AI updates the maintained documentation:
+
+```text
+CSV date export
+Default format: YYYY-MM-DD.
+Local format: pass --date-format local and specify the locale with --locale.
+Example: --date-format local --locale en-GB exports 2026-09-12 as 12/09/2026.
+Downstream programs requiring a stable format should use the default export.
+```
+
+![Figure 2: Start from current D and implementation evidence. Investigate critical unknowns and obtain authorization to enter E. Clear, authorized changes can enter E directly. Present results and obtain acceptance before synchronizing D.](assets/red-transitions.en.svg)
+
+*Figure 2. The AI can continue working within the authorized E scope. Authorization from R to E and acceptance from E to D happen at separate points, once concrete results are available for review. [PNG version](assets/red-transitions.en.png).*
+
+A person or a decision source designated by the project must make each decision. A broad “Do everything” at the start cannot replace review of later findings and implementation results. Teams can use existing issue or pull-request reviews, identifying who has authority and which scope they accept.
+
+If you reject the approach, D stays as it is, and you decide how to handle any attempted implementation. If you accept part of it, only that part enters D. Small fixes under existing rules can finish within the task. Create separate R/E records when the work needs handoff, review, or continued tracking.
+
+**The preserved result becomes useful in the next conversation.** You ask another agent to add an exported field. It first reads D to learn the default format and the option's boundaries, then inspects the relevant implementation. Reconstructing the previous investigation and its alternative approaches is no longer a prerequisite for starting this task.
+
+![Figure 3: Downstream-dependency questions, the optional-format change, and the accepted rule in the CSV example.](assets/red-example.en.svg)
+
+*Figure 3. One change leaves different material in R, E, and D. Subsequent tasks read the parts they need. [PNG version](assets/red-example.en.png).*
+
+### Conflicts between code and documentation
+
+D describes what the project should be. Code, tests, and runtime results provide evidence of what the system does. The AI needs both.
+
+Suppose D specifies an unchanged default, but runtime output uses a local format. The implementation may have drifted, or an accepted change may be missing its documentation update. The AI should report the conflict and investigate in R. An authorized decision then determines whether to repair implementation or revise the agreement through E.
+
+The AI uses implementation evidence to investigate in R, verify a change in E, and check consistency after updating D. Writing code that exhibits a behavior does not give that behavior the status of a project rule.
+
+## 5. Bringing AI conversations to a conclusion
+
+RED also addresses a recurring problem: where the results belong after you finish working through something with an AI.
+
+A conversation is a temporary workspace. You can explore, argue, and abandon an idea you proposed a moment ago. At the end, the AI should organize outcomes according to their future use:
+
+| Conversation outcome | How to conclude it |
 |---|---|
-| An unresolved question that affects later choices | Keep it in Research with evidence, assumptions, and unknowns |
-| A change the participants have decided to pursue | Develop it in Evolve through a plan, actions, implementation, and acceptance conditions |
-| Accepted understanding that future work will depend on | Update Document to establish the new baseline |
-| Digressions, repetition, and temporary drafts with no future use | Let them go when the conversation ends |
+| An unresolved question affecting later choices | Preserve the question, evidence, and unknowns in R |
+| A change you have decided to pursue | Identify scope, actions, acceptance conditions, and remaining work in E |
+| Accepted understanding that future work should follow | Synchronize into the relevant D |
+| Digressions, repetition, and drafts without future use | Let them expire with the conversation |
 
-Moving material into a state does not require creating a new file. A small change that fits within the current task may become code, tests, or a revision to existing documentation. Create a separate Research or Evolve record when it helps with handoff, review, or further tracking. Document preserves accepted conclusions that remain valid, rather than the complete process that produced them.
+“Entering R/E” refers to knowledge state. Small work that can finish in the current task can be carried out there. Persist content when someone will need it across tasks, people, or time. R/E can use local files, Git, issues, or pull requests; the project chooses what to share.
 
-The aim is to account for the conversation's work: retain questions worth investigating, turn intended changes into action, preserve accepted understanding, and let the rest expire. This avoids both losing useful work and retaining the same unresolved problem in a growing collection of summaries.
+An agent that pauses during investigation leaves questions and evidence another agent can pick up. An agent that pauses during implementation records progress and remaining work. After an accepted change, it updates the maintained description that the next task will read. A new agent can continue from an explicit state without asking the user to retell the entire process.
 
-If a proposal is rejected, Document stays as it is. Keep tradeoff reasoning with lasting value in Evolve or the project's chosen collaboration system. Short-lived experiments can end. If only part of a proposal is accepted, Document should reflect that accepted scope.
+You also gain a way to inspect the AI's work: which D sources it is using, which E problem it is addressing, and which R assumptions remain unverified. If it has misunderstood the project, you can correct the relevant material and use it to guide a corresponding implementation fix.
 
-Code and tests are executable evidence throughout this process. They do not form a fourth knowledge state. During Research, people use them and runtime results to investigate the system. During Evolve, they help validate candidate approaches and acceptance conditions. After acceptance, they help establish whether implementation matches the agreement.
+## 6. What still needs maintenance with longer context
 
-Document describes what the project should be; code and tests show how the system currently behaves. Either can be incomplete or outdated. Investigate conflicts in Research, then enter Evolve if resolving them requires a project change. The existence of code does not make its behavior an accepted requirement, and a written requirement does not justify ignoring contradictory implementation evidence.
+Loading the entire history into a longer context gives the AI more material. A finished discussion, a rejected approach, and a current rule still serve different purposes, even if all three appear in the input.
 
-The four difficulties from the opening now have corresponding practices:
+If you have rejected a change, the complete history can help the AI find that decision. Maintaining the current state lets later tasks avoid reconstructing it. If you have not decided, the model can analyze tradeoffs and make a recommendation; someone still needs to confirm whether the project will adopt it.
 
-| Difficulty | RED practice |
-|---|---|
-| Losing the project's foundations | Begin with a maintained Document baseline |
-| Treating speculation like a requirement | Apply explicit entry criteria to each knowledge state |
-| Being unable to inspect the AI's understanding | Review Evolve proposals and Document changes rather than guessing at hidden reasoning |
-| Leaving conversations unresolved | Account for outcomes as unknowns, actions, accepted understanding, or material to discard |
+Likewise, retrieving a passage establishes that relevant material was found. Before using it, the agent needs to know whether it belongs to the current rules, an investigation, or a developing proposal. Keeping state alongside content provides a shared basis for retrieval, summaries, and task handoffs.
 
-## 5. Why this structure remains useful
+RED therefore proposes a concrete structure for an AI's continued project understanding: obtain the task's baseline from current D, investigate decision-relevant unknowns in R, develop authorized changes in E, and synchronize accepted results back into D. The AI reads project knowledge and helps maintain the input for its next task.
 
-It is reasonable to ask whether a sufficiently large context window could make this structure unnecessary. If a model could hold one million, ten million, or a billion tokens, could it remember everything about a project?
+Someone must maintain D, judge evidence, and accept results. An outdated baseline, ambiguous confirmation, or records that have outlived their purpose will still hinder the work. Start with one real change, then check whether the next task requires less repeated explanation and whether the cost of maintaining the records is worthwhile.
 
-Three distinctions matter.
+## 7. From AI programming to sustained collaboration
 
-First, retaining information does not establish how to use it. A larger window helps only with material that has been loaded. Information omitted from a new conversation remains unavailable. Even when the complete history fits, the model needs to distinguish current agreements from obsolete designs, rejected proposals, and records of bugs that have since been fixed.
+This method grew out of AI programming practice. Code makes the problem easier to observe: an AI's misreading of an old suggestion can appear in its next commit. Subsequent implementation also gives us a way to check whether we have maintained the current agreement well enough.
 
-Second, larger windows can increase the amount of competing material. The AI encounters more facts, discussions, and historical records at once. Without explicit indications of what has expired, what remains under discussion, and what participants currently accept, the additional context can make judgment harder.
+The same distinctions can be applied when writing a report or designing a course with AI. Interview material, an analysis under revision, and confirmed conclusions need to play different roles in the next task. You can keep the existing files, assign them explicit knowledge states, and preserve the conclusions worth relying on as the work finishes.
 
-Third, the authority of a statement may depend on facts outside its wording. “Should we consider supporting iOS?” does not, by itself, establish whether the speaker was making a suggestion or recording a decision. That status comes from the collaboration process and the judgment of its participants.
+Return to the opening CSV scenario. The next time the AI reads “local date format,” it should be able to establish whether this is a request under investigation, an approach being developed, or an accepted option. The judgments you made together should continue to govern the next action.
 
-Larger models and context windows improve how much information an AI can extract from text. RED provides information about the status that participants assign to that text. These capabilities address different parts of the problem.
-
-People make such distinctions in ordinary work. “Write that down so we can check it later” and “We have decided; proceed on that basis” lead to different actions. We classify the information and give it different authority. An AI needs us to make those distinctions explicit in the material it uses.
-
-RED turns that practice into rules an AI can follow:
-
-- **Document contains accepted understanding.** The AI relies on it by default. If verifiable evidence conflicts with it, the AI reports the conflict and routes it through Research or Evolve instead of disregarding or rewriting the baseline on its own.
-- **Evolve contains understanding in development.** The AI participates in shaping it while keeping provisional choices distinct from final commitments.
-- **Research contains unsettled material.** The AI uses it to guide investigation and keeps unverified claims from becoming decisions.
-
-Making the status explicit gives both participants a shared basis for the next action.
-
-## 6. Beyond AI programming
-
-RED grew out of programming, but investigating unknowns, developing changes, and preserving accepted understanding also occur in other kinds of collaborative work.
-
-For a market analysis, use Research to gather missing data, conduct interviews, and examine competitors. In Evolve, develop the analytical framework and revise the analysis. The accepted report becomes Document. In strategic planning, investigate unknowns that could alter the direction, compare options in Evolve, and preserve the agreed strategy in Document. In teaching, investigate students' backgrounds or unfamiliar materials when necessary, then develop lesson plans, try them, and revise them before establishing the course materials and syllabus. With reliable source material and clear delivery criteria, any of these tasks can enter Evolve directly.
-
-These activities share a familiar pattern: explore, narrow the choices, and preserve the result. AI programming has accelerated that pattern and made its consequences more visible. RED describes a process that people often leave implicit but need to make explicit when collaborating with AI.
-
-## 7. Conclusion
-
-Return to the CSV export example. A passing remark from three months earlier became a rule because its status was never established. It was neither an identified Research hypothesis, an Evolve proposal under discussion, nor an accepted agreement in Document. It remained an unclassified statement in the conversation.
-
-RED makes that missing status explicit. The participants can distinguish “we do not know yet,” “we are working through this,” and “we have accepted this.” The AI has less reason to guess at the authority of a remark. People can review the developing proposal and the proposed changes to accepted understanding, instead of repeatedly correcting an interpretation they cannot inspect.
-
-Someone still has to make and maintain those distinctions. Longer context windows, retrieval, and stronger reasoning cannot establish an agreement that the participants have never made explicit. People remain responsible for confirming the status of project knowledge.
-
-RED gives their judgment a form the AI can recognize: whether it is working with an idea that is still taking shape or an agreement it is expected to follow.
+RED turns that requirement into a repeatable way of working: investigate unknowns, develop changes, and preserve accepted understanding. People and AI maintain the project's current understanding together, then use it as the starting point for the next task.
