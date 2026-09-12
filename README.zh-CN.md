@@ -143,7 +143,7 @@ red skill update --scope repo
 ## 进一步了解
 
 - **先读一篇介绍：**[和 AI 把想法做成项目：试试 RED](methodology/introducing-red.wechat.md)。
-- **了解完整方法：***Introducing RED: A Methodology for AI Understanding* — [中文完整篇](methodology/introducing-red.md) · [English](methodology/introducing-red.en.md)。
+- **了解完整方法：** *Introducing RED: A Methodology for AI Understanding* — [中文完整篇](methodology/introducing-red.md) · [English](methodology/introducing-red.en.md)。
 - **接入项目：**[接入指南](docs/adoption.md)。
 - **查阅规则：**[RED Protocol 1](spec/protocol.md) 与 [CLI 契约](spec/cli-interface.md)。
 - **参与开发：**[架构说明](docs/architecture.md)、[贡献指南](CONTRIBUTING.md)和[发布流程](docs/releasing.md)。
