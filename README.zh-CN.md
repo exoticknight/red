@@ -148,7 +148,7 @@ red skill update --scope repo
 - **查阅规则：**[RED Protocol 1](spec/protocol.md) 与 [CLI 契约](spec/cli-interface.md)。
 - **参与开发：**[架构说明](docs/architecture.md)、[贡献指南](CONTRIBUTING.md)和[发布流程](docs/releasing.md)。
 
-## RED 也用 RED 维护
+## RED 使用 RED 维护
 
 本仓库采用 RED Protocol 1。[`red.toml`](red.toml) 映射已接受的文档，以及本地的 `research/`、`evolve/` 工作目录。这里的 Research 和 Evolve 记录不纳入 Git；贡献者通过 issue 或 pull request 共享工作状态。CI 根据项目配置运行 `red check --json`。
 
