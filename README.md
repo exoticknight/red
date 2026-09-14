@@ -34,7 +34,15 @@ Document lives in your existing project documentation. Source code, tests, confi
 
 ## Quick start
 
-From the project where you want to use RED, install the Skill with either runner:
+From the project where you want to use RED, install the Skill with [skills](https://github.com/vercel-labs/skills):
+
+```sh
+npx skills add exoticknight/red --skill red
+```
+
+Choose your target agent during installation, or specify it with `--agent codex` (for example). Add `--global` for a user-level installation. This installs the Skill from this repository; the RED CLI is optional.
+
+You can also install a release-matched Skill with the RED CLI:
 
 ```sh
 npx -y @exoticknight/red@latest skill install --scope repo
@@ -46,7 +54,7 @@ Or with Python:
 pipx run --spec red-methodology red skill install --scope repo
 ```
 
-Both install the same Skill into `.agents/skills/red`. In an agent that supports loading Skills from that directory, start with a request such as:
+Both RED CLI runners install the same Skill into `.agents/skills/red`. Once your agent has loaded the installed Skill, start with a request such as:
 
 > Use RED to inspect this project. Identify the accepted documentation, surface unresolved questions, and recommend the smallest useful adoption setup.
 
@@ -133,7 +141,13 @@ The flags record acceptance and verification already supplied by a human or proj
 
 ### Keep the Skill current
 
-After upgrading the CLI package, update the managed Skill installation:
+For a Skill installed through `skills`, use:
+
+```sh
+npx skills update
+```
+
+This checks and updates Skills managed by `skills`. For a Skill installed through the RED CLI, upgrade the CLI package and then update its managed installation:
 
 ```sh
 red skill update --scope repo

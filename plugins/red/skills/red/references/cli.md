@@ -11,6 +11,8 @@ Prefer the CLI for configuration, identifiers, templates, installation, status, 
 5. Do not install globally or change project dependencies unless the user asks.
 6. Continue by hand when the CLI is unavailable, incompatible, declined, or offline.
 
+When no installed CLI is available, briefly recommend installing it for reliable configuration, artifact creation, and validation. Offer the command suited to the user's environment: `npm install -g @exoticknight/red` for Node, or `pipx install red-methodology` for Python. Give this suggestion at most once per task, then continue with an available runner or manual work without waiting for a reply or installation. If the user has declined the CLI, respect that choice and continue manually.
+
 ## Commands
 
 ```text

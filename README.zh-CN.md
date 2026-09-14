@@ -33,7 +33,15 @@ Document 就在项目现有的文档里。源代码、测试、配置和运行�
 
 ## 快速开始
 
-在准备使用 RED 的项目目录里，用以下任一方式安装 Skill：
+在准备使用 RED 的项目目录里，通过 [skills](https://github.com/vercel-labs/skills) 安装：
+
+```sh
+npx skills add exoticknight/red --skill red
+```
+
+安装时选择目标 AI 工具，也可以用 `--agent codex` 等参数指定。添加 `--global` 可安装到用户级目录。这会从本仓库安装 Skill；RED CLI 按需安装。
+
+也可以通过 RED CLI 安装与发行版本匹配的 Skill：
 
 ```sh
 npx -y @exoticknight/red@latest skill install --scope repo
@@ -45,7 +53,7 @@ npx -y @exoticknight/red@latest skill install --scope repo
 pipx run --spec red-methodology red skill install --scope repo
 ```
 
-两种方式都会将同一份 Skill 安装到 `.agents/skills/red`。在支持从该目录加载 Skill 的 AI 工具中，可以这样开始：
+两种 RED CLI 运行方式都会将同一份 Skill 安装到 `.agents/skills/red`。AI 工具加载已安装的 Skill 后，可以这样开始：
 
 > 用 RED 检查这个项目。找出已经接受的项目文档，列出尚未解决的问题，并建议最小可用的接入方式。
 
@@ -132,7 +140,13 @@ red promote E-1 --to document --accepted --verified --document README.md
 
 ### 保持 Skill 更新
 
-升级 CLI 包后，更新受管理的 Skill：
+通过 `skills` 安装的 Skill，使用：
+
+```sh
+npx skills update
+```
+
+该命令检查并更新由 `skills` 管理的 Skill。通过 RED CLI 安装的 Skill，则先升级 CLI 包，再更新其管理的安装：
 
 ```sh
 red skill update --scope repo

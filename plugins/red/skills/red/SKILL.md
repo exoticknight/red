@@ -35,4 +35,4 @@ Keep accepted knowledge, unresolved research, and ongoing change distinct.
 
 ## Finish
 
-Reconcile active E with current decisions, evidence, remaining work, and open alternatives. Report verification, conflicts, and unknowns; apply the transition boundary above. Run `red check --json` when the CLI is available, and state when it could not run.
+Reconcile active E with current decisions, evidence, remaining work, and open alternatives. Report verification, conflicts, and unknowns; apply the transition boundary above. Run `red check --json` when the CLI is available, and state when it could not run. If the CLI is missing, follow the brief installation suggestion in [cli.md](references/cli.md) while continuing the task.
