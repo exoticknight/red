@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3
+
+- Document installation through `npx skills add exoticknight/red --skill red` and updates through the skills CLI.
+- Recommend CLI installation when unavailable while continuing the user's task without waiting for installation.
+- Add a Chinese README and refine the bilingual quick starts and RED self-maintenance guidance.
+- Publish the bilingual methodology website and improve article navigation and publication metadata.
+- Refine the WeChat introduction and workflow figure, with an editable SVG template and reproducible PNG export.
+
 ## 0.1.2
 
 - Clarify knowledge ownership, durable rationale, reader-task verification, and replacement of existing knowledge in the RED Skill.
