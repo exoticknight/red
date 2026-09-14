@@ -21,7 +21,7 @@
 <p align="center">
   <a href="spec/protocol.md"><img src="https://img.shields.io/badge/protocol-1-C1121F" alt="RED Protocol 1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-444444" alt="Apache License 2.0"></a>
-  <a href="red.toml"><img src="https://img.shields.io/badge/maintained_with-RED-C1121F" alt="Maintained with RED"></a>
+  <a href="https://github.com/exoticknight/red"><img src="https://img.shields.io/badge/maintained_with-RED-C1121F" alt="Maintained with RED"></a>
 </p>
 
 An AI agent needs to know which ideas are still being investigated, which changes are underway, and which decisions it can rely on. RED makes those states explicit in the project:

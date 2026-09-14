@@ -20,7 +20,7 @@
 <p align="center">
   <a href="spec/protocol.md"><img src="https://img.shields.io/badge/protocol-1-C1121F" alt="RED Protocol 1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-444444" alt="Apache License 2.0"></a>
-  <a href="red.toml"><img src="https://img.shields.io/badge/maintained_with-RED-C1121F" alt="使用 RED 维护"></a>
+  <a href="https://github.com/exoticknight/red"><img src="https://img.shields.io/badge/maintained_with-RED-C1121F" alt="使用 RED 维护"></a>
 </p>
 
 AI 需要知道：哪些想法还在调查，哪些改动正在推进，哪些决定已经可以依循。RED 在项目中明确这些状态：

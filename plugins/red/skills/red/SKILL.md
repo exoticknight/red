@@ -27,7 +27,7 @@ Keep accepted knowledge, unresolved research, and ongoing change distinct.
 ## Routes
 
 - Engineering work and E maintenance: [work.md](references/work.md).
-- First-time or brownfield adoption: [adopt.md](references/adopt.md).
+- First-time or brownfield adoption, including an optional README badge: [adopt.md](references/adopt.md).
 - Project health checks: [inspect.md](references/inspect.md).
 - Creating/promoting artifacts or drafting/updating Document: [artifacts.md](references/artifacts.md).
 - Using, enabling, or falling back from the CLI: [cli.md](references/cli.md).
