@@ -12,19 +12,19 @@ Each name has an SVG and a PNG file. SVG provides scalable text and geometry; PN
 
 ## Editing and export
 
-Edit the drawing content in [render_methodology_figures.py](../../scripts/render_methodology_figures.py), then regenerate both formats from the repository root:
+Edit the public-account transitions drawing in [red-transitions.wechat.svg](../../scripts/assets/red-transitions.wechat.svg); edit the other drawings in [render_methodology_figures.py](../../scripts/render_methodology_figures.py). Regenerate both formats from the repository root:
 
 ```sh
 python scripts/render_methodology_figures.py
 ```
 
-The script uses Python's standard library to author explicit SVG elements and the installed ImageMagick SVG renderer to export PNGs at 144 DPI (1.5 times the SVG pixel dimensions). It requires `magick` on PATH and Microsoft YaHei for Chinese and Latin labels. An alternative installed font can be selected with `--font "Font Name"`; inspect wrapping and text fit after changing it. The SVG viewer also needs a suitable font; the exported PNG preserves the rendered text independently of the reader's fonts.
+The script uses Python's standard library to author explicit SVG elements and the installed ImageMagick SVG renderer to export PNGs at 144 DPI (1.5 times the SVG pixel dimensions) for the generated drawings. The public-account transitions template exports at its native 1080 × 1500 dimensions. It requires `magick` on PATH and Microsoft YaHei for Chinese and Latin labels. An alternative installed font can be selected with `--font "Font Name"`; inspect wrapping and text fit after changing it. The SVG viewer also needs a suitable font; the exported PNG preserves the rendered text independently of the reader's fonts.
 
 Keep labels and layout synchronized between the two formal-paper languages. Check arrows against Protocol 1, and visually inspect the exported images after editing. R, E, and D have textual labels as well as distinct colors. Arrowheads are explicit geometry, and the SVGs contain titles and descriptions.
 
 ## Preparing the public-account article
 
-Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and arranged vertically for phone reading. Upload it through the publishing editor at the image position in the article. `red-transitions.wechat.png` follows the paragraph explaining how the documents drive the next action; it is also 1080 pixels wide. The optional `red-example.wechat.png` has the same width. Preview the finished article on a phone, since the editor may resize images or change spacing.
+Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and arranged vertically for phone reading. Upload it through the publishing editor at the image position in the article. `red-transitions.wechat.png` follows the paragraph explaining how the documents drive the next action; it is 1080 × 1500 pixels, with vertically arranged question-led cards and two highlighted decision checkpoints. The optional `red-example.wechat.png` has the same width. Preview the finished article on a phone, since the editor may resize images or change spacing.
 
 The public-account draft uses absolute HTTPS URLs for all reader-facing links. Its full-article link points to the Chinese methodology article at `https://blog.e10t.net/red/`, with an English language switch. Before publishing, deploy the reviewed website and check that the desired revision is available at that public URL; local branch edits do not update it. The project homepage link points to `https://github.com/exoticknight/red`.
 
