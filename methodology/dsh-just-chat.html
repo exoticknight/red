@@ -1,0 +1,135 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RED 实战：用 AI 把一个想法做成能用的 DSH 插件</title></head><body style="margin:0;background:#fff;"><main style="box-sizing:border-box;max-width:680px;margin:0 auto;padding:28px 22px;"><section style="font-family:-apple-system,BlinkMacSystemFont,Microsoft YaHei,sans-serif;color:#30383c;font-size:18px;line-height:1.9;overflow-wrap:break-word;"><p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">最近 DSH（DeepSeek Harness）挺火，很多人一边拿它做项目，一边研究怎么给它加点东西。它有个挺适合折腾的地方：哪里用着不顺，先别忍着，顺手做个插件改进一下就行。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">用 DSH 做项目时，围绕工作区开始对话很自然：选好项目目录，接着让 AI 读代码、改文件。但用着用着，也会冒出一些和当前项目无关的问题。查个资料、问个技术细节，或者临时讨论一个想法，都想顺手开一段新对话。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">在这次使用的 DSH Web <code style="font-family:Consolas,monospace;font-size:.88em;background:#f3f4f5;padding:2px 4px;overflow-wrap:anywhere;">0.1.5-rc.2</code> 中，新对话要先有工作区。沿用当前项目，这些临时话题就和项目混在一起；另外准备目录，又多了一步操作。想要的其实很简单：有一个入口，点一下就能开始，顺便把工作目录准备好。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">于是就有了做个“快速对话”插件的想法。聊天界面、模型和权限继续用 DSH 原生的，插件负责把开始对话这一步变方便。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">做出来的 <span>dsh-just-chat</span><sup style="font-size:12px;line-height:0;vertical-align:super;color:#b72c38;">1</sup> 是这个样子：首页和侧栏各有一个入口，点击后准备独立工作目录，打开原生对话。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;"><img src="https://raw.githubusercontent.com/exoticknight/dsh-just-chat/v0.1.4/docs/images/quick-chat-head.jpg" alt="首页和侧栏的快速对话入口" style="display:block;max-width:100%;width:100%;height:auto;margin:26px auto 10px;border-radius:6px;"><span style="display:block;margin:0 0 24px;font-size:12px;line-height:1.7;text-align:center;color:#788087;">首页和侧栏的快速对话入口</span></p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">开发采用 RED，操作起来很轻：让 AI 研究怎么实现，先做 demo 看效果；没跑通，就把现象告诉 AI，继续研究。主要流程可以了，再让它进入 E 做完整开发。代码交给 AI 处理，最后实际用一遍，有问题再继续查。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">下面用基础对话和命名设置两轮开发展开演示。对话做了压缩整理，第二轮按已有功能组织演示顺序，截图展示实际成品。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">开发环境已加载 <span>RED Skill</span><sup style="font-size:12px;line-height:0;vertical-align:super;color:#b72c38;">2</sup>。Research（R）用于调查和试做，Evolve（E）推进确定要做的改动，Document（D）维护已经接受的项目知识。这几个状态怎样用，放到具体开发里就容易理解了。</p>
+<h2 style="margin:36px 0 18px;font-size:23px;line-height:1.55;font-weight:700;color:#26333a;">第一轮：从“想加个按钮”到能开始对话</h2>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">先做个 demo 看看</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">直接告诉 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">给 DSH 做个快速对话插件，点一下就能聊，不用先选项目。用 RED 研究一下怎么实现，先做个 demo 看看效果。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">现在进入 R。AI 要研究插件怎样加载、原生聊天界面怎样打开，并用 demo 验证可行性。先把想要的体验说清楚，实现方式交给 AI 在试做中探索。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">打开 demo，点按钮，试着输入。这里碰到了一个问题：页面已经切到对话，却还是不能打字。于是继续反馈：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">对话是出来了，但输入框还是不能用。你研究一下为什么，改好以后再试。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 进一步研究后确认，会话已经创建，原生输入框仍要求选择工作区。AI 需要检查宿主的会话和工作区如何配合，继续调整调用方式。研究中写出的代码，正好用来判断这条路能否走通。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">试用时也进一步明确了目录的要求：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">临时聊点别的，每次用一个独立目录。没有工作区的时候也应该能直接开始。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这句话会改变方案。AI 接下来需要研究怎样准备目录和工作区；demo 的目标也随之明确：从没有工作区的状态开始，点开入口，输入消息，收到回复。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">改完再试，AI 再根据反馈调整。在这个来回里，最初的“加个按钮”逐渐有了确定的行为。R 中的发现会影响接下来做什么：会话存在但无法输入，就继续查；独立目录方案能让主要流程跑通，就让它继续完成开发。</p>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">流程通了，进 E</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">看过可用的效果后，直接告诉 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">这个主要流程可以了，进 E，把插件完整做出来。首页和侧栏都放入口，其他对话能力沿用 DSH 原生的。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这次确认给了 AI 一个明确方向。它开始围绕选定方案整理插件结构、处理错误、接入配置、完善调试方式，并做相应检查。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">E 里的工作有一个已经确认的目标：每次通过入口进入独立目录里的原生对话。技术细节交给 AI 处理，接下来继续看实际效果。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">完成后，先后点两次入口、发消息，再试试删除测试工作区后重新开始。空工作区下点入口没反应的问题也在开发中暴露出来，反馈就是一句：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">现在没有工作区了，点快速对话没反应。你根据这个现象查一下。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 需要依据这个现象继续研究。它查到的原因可能只需要修复一处实现，也可能说明方案还缺了一部分；如果新发现影响了已经确定的行为，就要把影响说清楚，再调整。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这里，“没有工作区也能开始”已经确定。发现空工作区入口失效，AI 就应围绕这个目标修正，修正后再试。进 E 以后仍然会有调查、尝试和反馈，开发在这些来回中继续往前走。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这轮完成时，能看到一个具体变化：从需要先选项目，变成点击“快速对话”就能输入并收到回复。再次点击，则打开新的独立工作区。</p>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">用下来可以，确认这一版</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">试用符合预期后，直接告诉 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">可以了。把现在的用法和确定的行为整理进文档，后面继续在这个基础上做。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 把接受的结果整理到 D，比如 README 和开发说明。此时“每次独立目录”“沿用原生对话”“删除工作区会保留目录和会话记录”，已经是这个插件的当前约定。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这些约定还会影响下一次工作。增加设置时，AI 要知道哪些行为可以改；讨论清理功能时，要先了解现在会留下什么。如果以后决定改变它们，就连同实现和文档一起调整。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">第一轮交付了能用的功能，也明确了后续开发的起点。</p>
+<h2 style="margin:36px 0 18px;font-size:23px;line-height:1.55;font-weight:700;color:#26333a;">第二轮：用起来以后，再调整名字和设置</h2>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">基础对话已经可用，接下来想让它更顺手：工作区名字能带上日期，入口可以按习惯开关。</p>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">带着已有结果，继续研究</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">直接告诉 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">快速对话现在能用了。新工作区的名字要能自定义，比如带日期和时间；首页和侧栏的按钮也能分别开关。你研究一下怎么接到 DSH 的设置里，先做个效果看看。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 从第一轮确定的行为出发，研究设置入口和命名方式。现在需要探索的是怎么配置，同时继续保留独立目录和原生对话流程。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">设置部分也先看界面效果。配置的位置、修改何时生效，都在这一步进一步明确：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">放在插件自己的配置卡片里。改的时候先显示预览，点保存以后再生效，也要能放弃修改。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">再补一句：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">新名字只影响后面创建的工作区，之前的不要改。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">反馈把“能自定义”推进到了更具体的交互：编辑的是草稿，预览反映草稿，保存后才用于后续新建，已有工作区保持原样。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 需要据此调整配置和命名逻辑。再打开 demo，修改模板、试试放弃、保存后新建一次。哪些行为需要保留、哪些地方还要调整，会在这个过程中逐渐确定。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">第二轮就在第一轮成果上向前走了一步：已有的目录约定约束新功能，新需求又补充了“显示名称怎样变化”的规则。</p>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">这个效果可以，把它做完整</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">预览、开关和保存方式符合预期，就说：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">这个效果可以，进 E，按这个做完整。原来的快速对话继续保持现在的行为。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 进入实施，把已经看过的交互完成，并检查它与原有创建流程的配合。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">完成后就实际用一遍：改成带日期的名字，保存，再点一次快速对话，看新工作区的名字；改一次但选择放弃，看原值是否还在；关闭侧栏入口，继续从首页开始聊天。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;"><img src="https://raw.githubusercontent.com/exoticknight/dsh-just-chat/v0.1.4/docs/images/settings.png" alt="入口开关、名称模板、预览和保存操作" style="display:block;max-width:100%;width:100%;height:auto;margin:26px auto 10px;border-radius:6px;"><span style="display:block;margin:0 0 24px;font-size:12px;line-height:1.7;text-align:center;color:#788087;">入口开关、名称模板、预览和保存操作</span></p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">完成后的配置如上图所示。和第一轮相比，现在既能直接开始对话，也能调整入口和命名方式。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">界面也在试用中继续调整。窄窗口下入口溢出，就把现象交给 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">窗口缩窄以后按钮跑出去了，你看一下这个布局。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 根据现象检查页面和布局，修正后再缩窄窗口看看。内部需要哪些测试、怎样定位原因，都由 AI 推进；反馈围绕实际看到的效果展开。</p>
+<h3 style="margin:28px 0 14px;font-size:20px;line-height:1.6;font-weight:700;color:#26333a;">接受改动，更新当前约定</h3>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这轮用顺了，直接告诉 AI：</p>
+<blockquote style="margin:20px 0;padding:16px 18px;border-left:3px solid #b72c38;background:#faf4f3;">
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;;margin:0 0 12px;font-size:18px;line-height:1.9;color:#30383c;">可以了，把入口开关和命名模板的用法补进文档，说明只影响新建工作区。</p>
+</blockquote>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">AI 更新 D：在哪里配置、怎样预览和保存、哪些名称会受影响。独立目录和原生生命周期的既有约定继续适用，新的配置行为加入其中。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">再提出下一项需求时，AI 就有了更新后的起点。假如将来想让模板也能修改已有名称，那会改变这轮刚确定的规则，AI 需要研究影响，再推进新的方案。</p>
+<h2 style="margin:36px 0 18px;font-size:23px;line-height:1.55;font-weight:700;color:#26333a;">RED 怎样参与这两轮开发</h2>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">整个过程中的指令很日常：研究一下、做个 demo、这里不能用、这个效果可以、进 E、把文档整理好。每句话都在影响下一步。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">“研究一下”让 AI 围绕未知问题调查和试做；demo 暴露的问题和新的反馈，会调整它对需求、技术边界和方案的理解。“这个可以，进 E”让它把已经验证过的方向推进成完整功能。试用后接受结果，再让它更新项目共识，供后续研究和开发依循。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">两轮中，认识和实现一起发生变化：</p>
+<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin:24px 0;font-size:15px;line-height:1.75;">
+<thead>
+<tr>
+<th style="padding:10px 8px;border:1px solid #dce0e2;background:#f3f4f5;font-weight:700;overflow-wrap:anywhere;"></th>
+<th style="padding:10px 8px;border:1px solid #dce0e2;background:#f3f4f5;font-weight:700;overflow-wrap:anywhere;">第一轮</th>
+<th style="padding:10px 8px;border:1px solid #dce0e2;background:#f3f4f5;font-weight:700;overflow-wrap:anywhere;">第二轮</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">起点</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">想省掉选择项目这一步</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">已能聊天，想调整入口和名字</td>
+</tr>
+<tr>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">试做中变清楚的事</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">要有独立目录，空工作区也能开始</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">草稿可预览，保存后影响新建名称</td>
+</tr>
+<tr>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">确认后推进的开发</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">完整的快速对话插件</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">与原有流程配合的配置功能</td>
+</tr>
+<tr>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">接受后的当前约定</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">对话入口、目录和生命周期</td>
+<td style="padding:10px 8px;border:1px solid #dce0e2;vertical-align:top;overflow-wrap:anywhere;">在既有约定上增加配置与命名规则</td>
+</tr>
+</tbody>
+</table>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">人通过效果引导方向，AI 负责调查、实现和核对影响。RED 让探索中的想法、正在推进的选择和已经接受的共识各有明确状态，并指导 AI 随着发现和决定调整工作。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">下一轮可以从新疑问开始，也可以从已经明确的改动开始。这个项目先做 demo，是因为需要用实际效果判断方案；主要流程跑通后进 E，则是为了把选定方向做完整。具体怎么走，取决于当前还不知道什么、已经决定什么。</p>
+<h2 style="margin:36px 0 18px;font-size:23px;line-height:1.55;font-weight:700;color:#26333a;">看看成品</h2>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">本文对应插件 <code style="font-family:Consolas,monospace;font-size:.88em;background:#f3f4f5;padding:2px 4px;overflow-wrap:anywhere;">0.1.4</code> 和 DSH Web <code style="font-family:Consolas,monospace;font-size:.88em;background:#f3f4f5;padding:2px 4px;overflow-wrap:anywhere;">0.1.5-rc.2</code>。在已经能正常对话的对应 DSH 环境中，可以安装：</p>
+<pre style="white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-all;margin:20px 0;padding:16px;background:#f3f4f5;border-radius:6px;font-size:14px;line-height:1.8;"><code style="font-family:Consolas,monospace;">dsh plugin --profile web add dsh-just-chat@0.1.4
+</code></pre>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">使用与平时启动相同的 DSH Home 和 profile，安装后重启 DSH 并刷新页面。代码和用法见<span>项目仓库</span><sup style="font-size:12px;line-height:0;vertical-align:super;color:#b72c38;">1</sup>，本地调试见<span>开发指南</span><sup style="font-size:12px;line-height:0;vertical-align:super;color:#b72c38;">3</sup>。</p>
+<p style="margin:0 0 20px;font-size:18px;line-height:1.9;color:#30383c;">这个插件从“临时聊两句还要选目录”的使用问题出发，先把聊天流程跑通，再继续完善入口和命名。每次看效果，都能把需求说得更具体；AI 根据反馈研究和调整，再把确定的方向做完整。RED 就这样参与了两轮开发，也为接下来的改动提供了起点。</p>
+<p style="margin:0 0 8px;font-size:12px;line-height:1.7;color:#788087;overflow-wrap:anywhere;word-break:break-all;">[1] https://github.com/exoticknight/dsh-just-chat</p>
+<p style="margin:0 0 8px;font-size:12px;line-height:1.7;color:#788087;overflow-wrap:anywhere;word-break:break-all;">[2] https://github.com/exoticknight/red#quick-start</p>
+<p style="margin:0 0 8px;font-size:12px;line-height:1.7;color:#788087;overflow-wrap:anywhere;word-break:break-all;">[3] https://github.com/exoticknight/dsh-just-chat/blob/v0.1.4/docs/development.md</p></section></main></body></html>

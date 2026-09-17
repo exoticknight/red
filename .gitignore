@@ -16,6 +16,7 @@ cli/python/NOTICE
 .tmp/
 /output/
 /.agents/
+.playwright-cli/
 
 # This repository keeps its RED working state local.
 /research/
