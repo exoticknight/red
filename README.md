@@ -157,7 +157,8 @@ Use `--scope user` for an installation in your user-level `.agents/skills/red` d
 
 ## Go deeper
 
-- **Start with an introduction:** [和 AI 把想法做成项目：试试 RED（中文）](methodology/introducing-red.wechat.md).
+- **Start with an introduction:** [English](methodology/introducing-red.wechat.en.md) · [中文](methodology/introducing-red.wechat.md).
+- **See a practical case:** [English](methodology/dsh-just-chat.en.md) · [中文](methodology/dsh-just-chat.md).
 - **Read the methodology:** *Introducing RED: A Methodology for AI Understanding* — [English](methodology/introducing-red.en.md) · [中文完整篇](methodology/introducing-red.md).
 - **Adopt it in a project:** [Adoption guide](docs/adoption.md).
 - **Read the rules:** [RED Protocol 1](spec/protocol.md) and [CLI contract](spec/cli-interface.md).

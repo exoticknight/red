@@ -1,6 +1,6 @@
 # RED article site
 
-The bilingual RED methodology article for GitHub Pages. The build uses `markdown-it` to render `methodology/introducing-red.md` and `methodology/introducing-red.en.md`; edit those files to change article content. Site presentation lives in `build.mjs` and `style.css`. The separately maintained WeChat introduction links to the site's Chinese article.
+The RED article site for GitHub Pages. The build uses `markdown-it` to render the formal methodology, the bilingual introduction, and the bilingual DSH practical case from `methodology/`; edit those Markdown files to change article content. All pages share the presentation in `build.mjs` and `style.css`.
 
 ## Preview
 
@@ -24,12 +24,14 @@ Routes:
 
 - `index.html`: complete Chinese article (site homepage)
 - `introducing-red.en.html`: complete English article
+- `introducing-red.wechat.html` / `introducing-red.wechat.en.html`: bilingual introduction
+- `dsh-just-chat.html` / `dsh-just-chat.en.html`: bilingual practical case
 
 Figures open at full size when clicked. Readers need no JavaScript, remote fonts or external rendering service.
 
 ## Publication and presentation
 
-The `publication` object in `build.mjs` owns the public author name, profile URL and the article site's first publication date. Both pages show that metadata and use the same values in Article structured data. Keep the date tied to publication; rebuilding the site does not change it. The configured public base URL also supplies the default-language link and social image URLs.
+The `publication` object in `build.mjs` owns the public author name, profile URL and the article site's first publication date. Every page shows that metadata and uses the same values in Article structured data. Keep the date tied to publication; rebuilding the site does not change it. Each language pair gets its own canonical and alternate-language links, and the configured public base URL supplies the social image URLs.
 
 The site follows the reader's system light/dark preference. Figures keep their authored colors and light backgrounds for legibility. Print styles retain the article title, byline, text and figures, with code wrapping to the page width. The stylesheet contains the theme colors, including code blocks, as CSS variables.
 

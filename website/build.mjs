@@ -17,9 +17,14 @@ const publication = {
 };
 const pageUrl = page => new URL(page.url === 'index.html' ? './' : page.url, origin).href;
 const pages = [
-  { file: 'introducing-red.md', url: 'index.html', lang: 'zh-CN', label: '中文', kind: '方法论', description: 'Research、Evolve、Document：按知识状态组织项目内容，让 AI 持续理解项目，并把讨论、实施与接受的共识连接起来。' },
-  { file: 'introducing-red.en.md', url: 'introducing-red.en.html', lang: 'en', label: 'English', kind: 'METHODOLOGY', description: 'Research, Evolve, Document: a methodology for helping AI sustain an accurate understanding of a project as it changes.' },
+  { file: 'introducing-red.md', url: 'index.html', lang: 'zh-CN', label: '中文', group: 'methodology', nextLabel: '中文方法论', kind: '方法论', description: 'Research、Evolve、Document：按知识状态组织项目内容，让 AI 持续理解项目，并把讨论、实施与接受的共识连接起来。', socialImage: 'assets/red-states.zh.png', socialImageAlt: 'RED：Research、Evolve、Document 的内容与用途' },
+  { file: 'introducing-red.en.md', url: 'introducing-red.en.html', lang: 'en', label: 'English', group: 'methodology', nextLabel: 'English methodology', kind: 'METHODOLOGY', description: 'Research, Evolve, Document: a methodology for helping AI sustain an accurate understanding of a project as it changes.', socialImage: 'assets/red-states.en.png', socialImageAlt: 'RED: Research, Evolve and Document — their content and uses' },
+  { file: 'introducing-red.wechat.md', url: 'introducing-red.wechat.html', lang: 'zh-CN', label: '中文', group: 'introduction', nextLabel: '中文入门文章', kind: '入门介绍', description: '和 AI 把想法做成项目：从一次报表改动开始，认识 Research、Evolve、Document 如何让协作接得上。', socialImage: 'assets/red-states.zh.png', socialImageAlt: 'RED：Research、Evolve、Document 的内容与用途' },
+  { file: 'introducing-red.wechat.en.md', url: 'introducing-red.wechat.en.html', lang: 'en', label: 'English', group: 'introduction', nextLabel: 'English introduction', kind: 'INTRODUCTION', description: 'Turn an idea into a project with AI while keeping research, changes, and accepted understanding distinct.', socialImage: 'assets/red-states.en.png', socialImageAlt: 'RED: Research, Evolve and Document — their content and uses' },
+  { file: 'dsh-just-chat.md', url: 'dsh-just-chat.html', lang: 'zh-CN', label: '中文', group: 'practical', nextLabel: '中文实战案例', kind: '实战案例', description: '用 AI 把一个想法做成能用的 DSH 插件：两轮开发中，RED 怎样让研究、推进和确认接得起来。', socialImage: 'https://raw.githubusercontent.com/exoticknight/dsh-just-chat/v0.1.4/docs/images/quick-chat-head.jpg', socialImageAlt: 'DSH 快速对话插件的首页和侧栏入口' },
+  { file: 'dsh-just-chat.en.md', url: 'dsh-just-chat.en.html', lang: 'en', label: 'English', group: 'practical', nextLabel: 'English practical case', kind: 'PRACTICAL CASE', description: 'From a rough idea to a usable DSH plugin: two development rounds shaped by Research, Evolve, and Document.', socialImage: 'https://raw.githubusercontent.com/exoticknight/dsh-just-chat/v0.1.4/docs/images/quick-chat-head.jpg', socialImageAlt: 'Quick-chat entries on the DSH home page and in the sidebar' },
 ];
+const languagePages = page => pages.filter(candidate => candidate.group === page.group);
 // This dedicated generated directory must not retain pages or assets removed from the site.
 if (out !== path.resolve(root, 'dist')) throw new Error('Unexpected output directory');
 await rm(out, { recursive: true, force: true });
@@ -35,10 +40,12 @@ await writeFile(path.join(out, '.nojekyll'), '');
 
 for (const page of pages) {
   const english = page.lang === 'en';
-  const content = await readFile(path.join(source, page.file), 'utf8');
+  const content = (await readFile(path.join(source, page.file), 'utf8')).replace(/<!--[\s\S]*?-->/g, '').trimStart();
   const tokens = md.parse(content, {});
-  const title = tokens[1].content;
-  tokens.splice(0, 3);
+  const titleIndex = tokens.findIndex(token => token.type === 'heading_open' && token.tag === 'h1');
+  if (titleIndex < 0) throw new Error(`Missing h1 in ${page.file}`);
+  const title = tokens[titleIndex + 1].content;
+  tokens.splice(titleIndex, 3);
   const toc = [];
   const used = new Map();
   tokens.forEach((token, i) => {
@@ -60,11 +67,14 @@ for (const page of pages) {
   const body = md.renderer.render(tokens, md.options, {});
   md.renderer.rules.image = originalImage;
   const canonical = pageUrl(page);
-  const imageUrl = new URL(`assets/red-states.${english ? 'en' : 'zh'}.png`, origin).href;
-  const imageAlt = english ? 'RED: Research, Evolve and Document — their content and uses' : 'RED：Research、Evolve、Document 的内容与用途';
+  const imageUrl = /^https?:\/\//.test(page.socialImage) ? page.socialImage : new URL(page.socialImage, origin).href;
+  const imageAlt = page.socialImageAlt;
   const publishedLabel = new Intl.DateTimeFormat(page.lang, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(publication.datePublished));
   const minutes = english ? Math.ceil(content.split(/\s+/).length / 220) : Math.ceil(content.replace(/\s/g, '').length / 450);
-  const alternates = pages.map(p => `<link rel="alternate" hreflang="${p.lang}" href="${esc(pageUrl(p))}">`).join('');
+  const pair = languagePages(page);
+  const defaultPage = pair.find(p => p.lang === 'zh-CN') || pair[0];
+  const alternatePage = pair.find(p => p.lang !== page.lang);
+  const alternates = pair.map(p => `<link rel="alternate" hreflang="${p.lang}" href="${esc(pageUrl(p))}">`).join('');
   const articleData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -83,15 +93,15 @@ for (const page of pages) {
 <html lang="${page.lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)} · RED</title><meta name="description" content="${esc(page.description)}">
 <meta name="author" content="${esc(publication.author.name)}">
-<link rel="canonical" href="${esc(canonical)}">${alternates}<link rel="alternate" hreflang="x-default" href="${esc(pageUrl(pages[0]))}">
-<meta property="og:type" content="article"><meta property="og:site_name" content="RED"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${esc(imageUrl)}"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta property="og:locale" content="${english ? 'en_US' : 'zh_CN'}"><meta property="og:locale:alternate" content="${english ? 'zh_CN' : 'en_US'}"><meta property="article:published_time" content="${publication.datePublished}">
+<link rel="canonical" href="${esc(canonical)}">${alternates}<link rel="alternate" hreflang="x-default" href="${esc(pageUrl(defaultPage))}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="RED"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${esc(imageUrl)}"><meta property="og:image:alt" content="${esc(imageAlt)}"><meta property="og:locale" content="${english ? 'en_US' : 'zh_CN'}"><meta property="og:locale:alternate" content="${alternatePage ? (alternatePage.lang === 'en' ? 'en_US' : 'zh_CN') : (english ? 'zh_CN' : 'en_US')}"><meta property="article:published_time" content="${publication.datePublished}">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(page.description)}"><meta name="twitter:image" content="${esc(imageUrl)}"><meta name="twitter:image:alt" content="${esc(imageAlt)}">
 <script type="application/ld+json">${JSON.stringify(articleData).replace(/</g, '\\u003c')}</script>
 <meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#181c1a" media="(prefers-color-scheme: dark)"><link rel="icon" href="favicon.png" type="image/png" sizes="64x64"><link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any"><link rel="stylesheet" href="style.css"></head>
 <body><a class="skip" href="#article">${english ? 'Skip to article' : '跳到正文'}</a>
-<header class="site-header"><a class="brand" href="index.html" aria-label="${english ? 'RED home' : 'RED 首页'}">RED<span class="brand-dot">.</span></a><nav aria-label="${english ? 'Language' : '语言'}">${pages.map(p => `<a href="${p.url}" lang="${p.lang}"${p.url === page.url ? ' aria-current="page"' : ''}>${p.label}</a>`).join('')}<a class="repo" href="https://github.com/exoticknight/red">GitHub <span aria-hidden="true">↗</span></a></nav></header>
+<header class="site-header"><a class="brand" href="index.html" aria-label="${english ? 'RED home' : 'RED 首页'}">RED<span class="brand-dot">.</span></a><nav aria-label="${english ? 'Language' : '语言'}">${pair.map(p => `<a href="${p.url}" lang="${p.lang}"${p.url === page.url ? ' aria-current="page"' : ''}>${p.label}</a>`).join('')}<a class="repo" href="https://github.com/exoticknight/red">GitHub <span aria-hidden="true">↗</span></a></nav></header>
 <main id="article"><div class="article-heading"><div class="eyebrow"><span>RED / ${page.kind}</span><span>${minutes} ${english ? 'MIN READ' : '分钟阅读'}</span></div><h1>${esc(title)}</h1><p class="dek">${esc(page.description)}</p><p class="byline"><a rel="author" href="${esc(publication.author.url)}">${esc(publication.author.name)}</a><span>${english ? 'Published' : '发布于'} <time datetime="${publication.datePublished}">${esc(publishedLabel)}</time></span></p><div class="principles"><span><b>R</b> Research</span><span><b>E</b> Evolve</span><span><b>D</b> Document</span></div></div>
-<div class="reading-layout"><aside><details open><summary>${english ? 'IN THIS ARTICLE' : '本文目录'}</summary><nav aria-label="${english ? 'Table of contents' : '目录'}"><ol>${toc.join('')}</ol></nav></details></aside><div><article>${body}</article><section class="read-next"><p class="eyebrow">${english ? 'CONTINUE EXPLORING' : '继续阅读与实践'}</p>${pages.filter(p => p !== page).map(p => `<a href="${p.url}">${p.label} <span aria-hidden="true">↗</span></a>`).join('')}<a href="https://github.com/exoticknight/red">${english ? 'Try RED on your project' : '在你的项目里试试 RED'} <span aria-hidden="true">↗</span></a></section></div></div></main>
+<div class="reading-layout"><aside><details open><summary>${english ? 'IN THIS ARTICLE' : '本文目录'}</summary><nav aria-label="${english ? 'Table of contents' : '目录'}"><ol>${toc.join('')}</ol></nav></details></aside><div><article>${body}</article><section class="read-next"><p class="eyebrow">${english ? 'CONTINUE EXPLORING' : '继续阅读与实践'}</p>${pages.filter(p => p !== page).map(p => `<a href="${p.url}">${p.nextLabel} <span aria-hidden="true">↗</span></a>`).join('')}<a href="https://github.com/exoticknight/red">${english ? 'Try RED on your project' : '在你的项目里试试 RED'} <span aria-hidden="true">↗</span></a></section></div></div></main>
 <footer><a class="brand" href="index.html">RED<span class="brand-dot">.</span></a><span>Research · Evolve · Document</span><a href="https://github.com/exoticknight/red">${english ? 'Open-source project' : '开源项目'} ↗</a></footer></body></html>`;
   await writeFile(path.join(out, page.url), html);
   console.log(`Built ${page.url} (${toc.length} sections)`);
