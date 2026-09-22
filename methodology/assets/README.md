@@ -8,7 +8,7 @@ The [Chinese formal paper](../introducing-red.md) and [English formal paper](../
 | Routing and decision checkpoints | `red-transitions.zh.*`, `red-transitions.en.*` (Figure 2) | `red-transitions.wechat.*` (Figure 2) |
 | CSV date-export example | `red-example.zh.*`, `red-example.en.*` (Figure 3) | `red-example.wechat.*` (optional case illustration) |
 
-Each name has an SVG and a PNG file. SVG provides scalable text and geometry; PNG is the portable delivery copy. Formal papers embed SVG and link to PNG fallbacks. The public-account draft marks its image position with an editorial HTML comment; insert the PNG using the platform editor. Surrounding prose explains the same relationships for readers unable to load images.
+Each name has an SVG and a PNG file. SVG provides scalable text and geometry; PNG is the portable delivery copy. Formal papers embed SVG and link to PNG fallbacks. The public-account draft references its figures with Markdown image links. The website build renders them directly; when preparing a platform draft, upload the PNG through the publishing editor and replace the local image source as needed. Surrounding prose explains the same relationships for readers unable to load images.
 
 ## Editing and export
 
@@ -28,6 +28,6 @@ Use `red-states.wechat.png` at full article width. It is 1080 pixels wide and ar
 
 The public-account draft uses absolute HTTPS URLs for all reader-facing links. Its full-article link points to the Chinese methodology article at `https://blog.e10t.net/red/`, with an English language switch. Before publishing, deploy the reviewed website and check that the desired revision is available at that public URL; local branch edits do not update it. The project homepage link points to `https://github.com/exoticknight/red`.
 
-At the editorial image comment, upload `red-states.wechat.png` from this asset directory through the WeChat public-account editor and insert the uploaded image there. Use the platform-provided image address if preparing HTML. Remove the editorial comment when the image is in place. The author or an authorized assistant can do this during platform layout. No platform upload has been performed and no hosted image URL is assigned yet.
+At each image position in the generated draft, upload the corresponding PNG from this asset directory through the WeChat public-account editor and replace the local image source with the uploaded image there. Use the platform-provided image address if preparing HTML. The author or an authorized assistant can do this during platform layout. No platform upload has been performed and no hosted image URL is assigned yet.
 
-Check the finished draft for leftover upload comments, local paths, and relative links before publication. Open its links and preview the inserted image in the platform draft.
+Check the finished draft for local image paths and relative links before publication. Open its links and preview the inserted image in the platform draft.

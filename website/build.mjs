@@ -30,7 +30,7 @@ if (out !== path.resolve(root, 'dist')) throw new Error('Unexpected output direc
 await rm(out, { recursive: true, force: true });
 await mkdir(path.join(out, 'assets'), { recursive: true });
 for (const file of await readdir(path.join(source, 'assets'))) {
-  if (/\.(zh|en)\.(svg|png)$/.test(file)) await copyFile(path.join(source, 'assets', file), path.join(out, 'assets', file));
+  if (/\.(zh|en|wechat)\.(svg|png)$/.test(file)) await copyFile(path.join(source, 'assets', file), path.join(out, 'assets', file));
 }
 await copyFile(path.join(root, 'style.css'), path.join(out, 'style.css'));
 for (const file of ['favicon.svg', 'favicon.png']) {
