@@ -54,7 +54,7 @@ export function renderWechat(source) {
   md.renderer.rules.code_inline = (tokens, index) => `<code style="${styles.code}">${escape(tokens[index].content)}</code>`;
 
   const codeBlock = (tokens, index) => (
-    `<pre style="${styles.pre}"><code style="font-family:Consolas,monospace;">${escape(tokens[index].content)}</code></pre>\n`
+    `<pre style="${styles.pre}"><code style="font-family:monospace;">${escape(tokens[index].content)}</code></pre>\n`
   );
   md.renderer.rules.fence = codeBlock;
   md.renderer.rules.code_block = codeBlock;
@@ -77,6 +77,22 @@ export function renderWechat(source) {
   return { title, images, references, body };
 }
 
+const imageTypes = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+
+// Local figures are embedded so the HTML still shows them when opened elsewhere or copied into an editor.
+async function embedLocalImages(body, baseDir) {
+  const sources = [...new Set([...body.matchAll(/<img src="([^"]+)"/g)].map(match => match[1]))]
+    .filter(src => !/^(?:[a-z]+:|\/\/)/i.test(src));
+  for (const src of sources) {
+    const file = path.resolve(baseDir, src.replaceAll('&amp;', '&'));
+    const type = imageTypes[path.extname(file).toLowerCase()];
+    if (!type) continue;
+    const data = (await readFile(file)).toString('base64');
+    body = body.replaceAll(`<img src="${src}"`, `<img src="data:${type};base64,${data}"`);
+  }
+  return body;
+}
+
 export function outputPathFor(input) {
   const inputPath = path.resolve(input);
   const extension = path.extname(inputPath);
@@ -87,6 +103,7 @@ export async function writeWechat(input, outputFile = outputPathFor(input)) {
   const inputPath = path.resolve(input);
   const outputPath = path.resolve(outputFile);
   const result = renderWechat(await readFile(inputPath, 'utf8'));
+  result.body = await embedLocalImages(result.body, path.dirname(inputPath));
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, result.body);
   console.log(JSON.stringify({ title: result.title, images: result.images.length, references: result.references.length, output: outputPath }));
