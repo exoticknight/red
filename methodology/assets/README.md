@@ -1,12 +1,14 @@
 # Publication figures
 
-The [Chinese formal paper](../introducing-red.md) and [English formal paper](../introducing-red.en.md) use the same three figures with localized labels. The [Chinese public-account article](../introducing-red.wechat.md) uses the vertically arranged knowledge-state figure for mobile reading. A mobile case illustration is also available for expanded editions.
+The [Chinese formal paper](../introducing-red.md) and [English formal paper](../introducing-red.en.md) use the same three figures with localized labels. The [Chinese public-account article](../try-red.md) uses the vertically arranged knowledge-state figure for mobile reading. A mobile case illustration is also available for expanded editions.
 
 | Figure | Formal-paper files | Public-account files |
 |---|---|---|
 | Knowledge states | `red-states.zh.*`, `red-states.en.*` (Figure 1) | `red-states.wechat.*` (Figure 1) |
 | Routing and decision checkpoints | `red-transitions.zh.*`, `red-transitions.en.*` (Figure 2) | `red-transitions.wechat.*` (Figure 2) |
 | CSV date-export example | `red-example.zh.*`, `red-example.en.*` (Figure 3) | `red-example.wechat.*` (optional case illustration) |
+
+The [budget-model article](../frontier-and-budget-models.md) and its [English version](../frontier-and-budget-models.en.md) use three data figures: `frontier-and-budget-models-cost.*` (cost of mixing models versus running everything on one model), `frontier-and-budget-models-relay.*` (both models reading and writing the same R, E and D) and `frontier-and-budget-models-quota.*` (subscription message estimates), each in `.zh` and `.en`. Edit their labels and data in [render_frontier_and_budget_models_figures.py](../../scripts/render_frontier_and_budget_models_figures.py) and regenerate with `python scripts/render_frontier_and_budget_models_figures.py`. The articles embed the PNG files.
 
 Each name has an SVG and a PNG file. SVG provides scalable text and geometry; PNG is the portable delivery copy. Formal papers embed SVG and link to PNG fallbacks. The public-account draft references its figures with Markdown image links. The website build renders them directly; when preparing a platform draft, upload the PNG through the publishing editor and replace the local image source as needed. Surrounding prose explains the same relationships for readers unable to load images.
 
