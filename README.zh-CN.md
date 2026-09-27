@@ -156,7 +156,7 @@ red skill update --scope repo
 
 ## 进一步了解
 
-- **先读一篇介绍：**[中文](methodology/introducing-red.wechat.md) · [English](methodology/introducing-red.wechat.en.md)。
+- **先读一篇介绍：**[中文](methodology/try-red.md) · [English](methodology/try-red.en.md)。
 - **看一个实战案例：**[中文](methodology/dsh-just-chat.md) · [English](methodology/dsh-just-chat.en.md)。
 - **了解完整方法：** *Introducing RED: A Methodology for AI Understanding* — [中文完整篇](methodology/introducing-red.md) · [English](methodology/introducing-red.en.md)。
 - **接入项目：**[接入指南](docs/adoption.md)。

@@ -24,8 +24,9 @@ Routes:
 
 - `index.html`: complete Chinese article (site homepage)
 - `introducing-red.en.html`: complete English article
-- `introducing-red.wechat.html` / `introducing-red.wechat.en.html`: bilingual introduction
+- `try-red.html` / `try-red.en.html`: bilingual introduction
 - `dsh-just-chat.html` / `dsh-just-chat.en.html`: bilingual practical case
+- `frontier-and-budget-models.html` / `frontier-and-budget-models.en.html`: bilingual practical case on mixing frontier and budget models
 
 Figures open at full size when clicked. Readers need no JavaScript, remote fonts or external rendering service.
 
