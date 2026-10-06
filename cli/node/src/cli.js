@@ -524,7 +524,7 @@ function acceptIntoDocument(root, artifact, documentPaths, config, accepted, ver
   const finalMetadata = finalMatch ? parse(finalMatch[1]) : null;
   if (
     !finalMetadata ||
-    !isDeepStrictEqual(finalMetadata, prospective) ||
+    !isDeepStrictEqual({ ...finalMetadata }, prospective) ||
     !validateArtifactSchema(finalMetadata)
   ) {
     throw new Error("Refusing to write invalid promoted artifact metadata");
