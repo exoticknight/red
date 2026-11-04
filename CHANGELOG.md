@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.4
+
+- Fix Evolve-to-Document promotion with smol-toml's null-prototype parsed metadata.
+- Update smol-toml to 1.9.1 and fast-uri to 3.1.9, resolving dependency security advisories.
+- Offer an optional RED adoption badge in the Skill.
+- Expand the bilingual methodology website with new articles, dated entries, and categorized reading links.
+- Refresh GitHub Pages deployment actions and improve WeChat publishing assets.
+
 ## 0.1.3
 
 - Document installation through `npx skills add exoticknight/red --skill red` and updates through the skills CLI.
